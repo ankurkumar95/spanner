@@ -1,0 +1,21 @@
+# Node
+node_modules/
+dist/
+.vite/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+env/
+venv/
+*.db
+
+# Docker
+.docker_data/
+
+# OS
+.DS_Store
+.env
