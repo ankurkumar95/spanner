@@ -11,8 +11,6 @@ Set up the complete project skeleton, Docker infrastructure, database with ALL 1
 
 ---
 
-## What to Build
-
 ## Stitch Design References
 
 Reference these UI mockup files when building frontend components. Match the visual style, layout, colors, and component structure from these designs:
@@ -26,6 +24,8 @@ Reference these UI mockup files when building frontend components. Match the vis
 Open the HTML files in a browser to see the exact design. Replicate the visual style: colors, spacing, typography, and component layout.
 
 ---
+
+## What to Build
 
 ### 1. Project Structure
 
@@ -105,8 +105,8 @@ spanner/
         └── components/
             └── ProtectedRoute.tsx
 └── designs/                    (UI mockup designs — reference only, not deployed)
-│   ├── html/                   (20 interactive HTML screen mockups)
-│   └── screenshots/            (20 PNG preview images)
+    ├── html/                   (20 interactive HTML screen mockups)
+    └── screenshots/            (20 PNG preview images)
 ```
 
 ### 2. Docker Compose
