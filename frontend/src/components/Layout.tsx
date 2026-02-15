@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, Outlet } from 'react-router-dom';
 import GlobalSearch from './GlobalSearch';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC = () => {
   const location = useLocation();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -124,7 +120,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-8">
-          {children}
+          <Outlet />
         </main>
       </div>
       <GlobalSearch isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />

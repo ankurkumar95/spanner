@@ -1,6 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import client from '../api/client';
+import useAuth from '../hooks/useAuth';
 
 const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      const response = await client.post('/auth/login', { email, password });
+      const { access_token, refresh_token, user } = response.data;
+      login(access_token, refresh_token, user);
+      navigate('/');
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Failed to login');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="h-screen w-full flex items-center justify-center bg-[#FAFAFA]">
       <div className="w-full max-w-[400px] px-6">
@@ -13,7 +39,12 @@ const LoginPage: React.FC = () => {
         </div>
         <div className="bg-white rounded-xl border border-neutral-200 shadow-sm p-8">
           <h2 className="text-lg font-medium text-neutral-900 mb-6">Sign in to your account</h2>
-          <form action="#" className="space-y-5" method="POST">
+          <form action="#" className="space-y-5" method="POST" onSubmit={handleLogin}>
+            {error && (
+              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-100">
+                {error}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1.5" htmlFor="email">Email address</label>
               <input
@@ -23,6 +54,8 @@ const LoginPage: React.FC = () => {
                 placeholder="you@company.com"
                 required
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
@@ -34,6 +67,8 @@ const LoginPage: React.FC = () => {
                 placeholder="••••••••"
                 required
                 type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
             <div className="flex items-center justify-between">
@@ -52,10 +87,11 @@ const LoginPage: React.FC = () => {
             </div>
             <div>
               <button
-                className="flex w-full justify-center rounded-md border border-transparent bg-neutral-900 py-2.5 px-4 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 transition-colors duration-200"
+                className="flex w-full justify-center rounded-md border border-transparent bg-neutral-900 py-2.5 px-4 text-sm font-medium text-white shadow-sm hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-neutral-500 focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50"
                 type="submit"
+                disabled={loading}
               >
-                Sign in
+                {loading ? 'Signing in...' : 'Sign in'}
               </button>
             </div>
           </form>
