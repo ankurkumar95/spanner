@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Global Command Search Overlay - Spanner CRM</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#135bec",
+              "primary-dark": "#0e45b5",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+              "surface-light": "#ffffff",
+              "surface-dark": "#1a2234",
+              "neutral-100": "#f1f5f9",
+              "neutral-200": "#e2e8f0",
+              "neutral-300": "#cbd5e1",
+              "neutral-400": "#94a3b8",
+              "neutral-500": "#64748b",
+              "neutral-600": "#475569",
+              "neutral-700": "#334155",
+              "neutral-800": "#1e293b",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            boxShadow: {
+              'overlay': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              'glow': '0 0 15px rgba(19, 91, 236, 0.15)',
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        /* Custom scrollbar for the results list to keep it clean */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #334155;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-neutral-800 dark:text-neutral-100 h-screen overflow-hidden flex items-start justify-center pt-24 antialiased selection:bg-primary/30">
+<!-- 
+      BACKDROP OVERLAY 
+      This is the blurred background layer.
+    -->
+<div aria-hidden="true" class="fixed inset-0 bg-background-dark/40 dark:bg-background-dark/70 backdrop-blur-sm z-40 transition-opacity duration-300"></div>
+<!-- 
+      MAIN SEARCH CONTAINER 
+      The actual command palette modal.
+    -->
+<div class="relative w-full max-w-2xl bg-surface-light dark:bg-surface-dark rounded-xl shadow-overlay z-50 overflow-hidden flex flex-col border border-neutral-200 dark:border-neutral-700 mx-4 transform transition-all shadow-glow">
+<!-- SEARCH HEADER & INPUT -->
+<div class="flex items-center px-4 py-4 border-b border-neutral-100 dark:border-neutral-800">
+<span class="material-symbols-outlined text-neutral-400 text-2xl mr-3 select-none">search</span>
+<input autofocus="" class="w-full bg-transparent border-none p-0 text-lg text-neutral-800 dark:text-white placeholder-neutral-400 focus:ring-0 font-medium caret-primary" placeholder="Search Spanner CRM..." type="text"/>
+<div class="hidden sm:flex items-center gap-1">
+<kbd class="hidden sm:inline-block px-2 py-1 text-xs font-semibold text-neutral-500 bg-neutral-100 dark:bg-neutral-800 dark:text-neutral-400 rounded border border-neutral-200 dark:border-neutral-700 shadow-sm">Esc</kbd>
+</div>
+</div>
+<!-- RESULTS LIST CONTAINER -->
+<div class="max-h-[60vh] overflow-y-auto custom-scrollbar p-2">
+<!-- SECTION: COMPANIES -->
+<div class="mb-2">
+<div class="px-3 py-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider sticky top-0 bg-surface-light dark:bg-surface-dark">
+                    Companies
+                </div>
+<!-- Result Item: Active State Example -->
+<div class="group flex items-center justify-between px-3 py-2.5 bg-primary/10 dark:bg-primary/20 rounded-lg cursor-pointer border-l-4 border-primary transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-white dark:bg-neutral-800 flex items-center justify-center text-primary shadow-sm border border-neutral-100 dark:border-neutral-700">
+<span class="material-symbols-outlined text-lg">domain</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-neutral-900 dark:text-white">Acme Corp</span>
+<span class="text-xs text-neutral-500 dark:text-neutral-400">Tier 1 Account • San Francisco</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-neutral-400 dark:text-neutral-500 text-xl opacity-100">keyboard_return</span>
+</div>
+<!-- Result Item: Normal -->
+<div class="group flex items-center justify-between px-3 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer border-l-4 border-transparent transition-colors mt-1">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
+<span class="material-symbols-outlined text-lg">domain</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-neutral-700 dark:text-neutral-200 group-hover:text-primary dark:group-hover:text-primary-light transition-colors">Globex Inc</span>
+<span class="text-xs text-neutral-500 dark:text-neutral-400">Prospect • New York</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-neutral-400 text-xl opacity-0 group-hover:opacity-100 transition-opacity">keyboard_return</span>
+</div>
+</div>
+<!-- SECTION: CONTACTS -->
+<div class="mb-2 mt-4">
+<div class="px-3 py-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider sticky top-0 bg-surface-light dark:bg-surface-dark">
+                    Contacts
+                </div>
+<!-- Result Item -->
+<div class="group flex items-center justify-between px-3 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer border-l-4 border-transparent transition-colors">
+<div class="flex items-center gap-3">
+<div class="relative w-8 h-8">
+<!-- Profile Image with alt tag -->
+<img alt="Headshot of Alice Johnson" class="w-8 h-8 rounded-full object-cover border border-neutral-200 dark:border-neutral-700" data-alt="Headshot of Alice Johnson" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHzc4ysR3an-U2VYuj7AwM_6rJygMIiNt204xStpijlM0RKoQlr1rgsEHPWeVq_mr51uJYNsyjV-NzrRDFHdwVAYHdAcvSaIJcQlUZ_uMqoFeoucQPrOU_PVzfkNqVMbDo-C2kaaCSWk6r72OwudVQ6DYSEUYsyievkvDNYUTBs3udp6JFDqqfkJZSebv5jlYwLKyNCb_WLIrcwhQECoEATnDuCe9sdXxByDfBJ-l_Aez_9viMu9LbwZHAHuMeurtPymkwAZeDZK75"/>
+<!-- Status Indicator -->
+<span class="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full ring-2 ring-white dark:ring-surface-dark bg-green-400"></span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-neutral-700 dark:text-neutral-200 group-hover:text-primary transition-colors">Alice Johnson</span>
+<span class="text-xs text-neutral-500 dark:text-neutral-400">VP of Marketing @ Acme</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-neutral-400 text-xl opacity-0 group-hover:opacity-100 transition-opacity">keyboard_return</span>
+</div>
+<!-- Result Item -->
+<div class="group flex items-center justify-between px-3 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer border-l-4 border-transparent transition-colors mt-1">
+<div class="flex items-center gap-3">
+<div class="relative w-8 h-8">
+<img alt="Headshot of Bob Smith" class="w-8 h-8 rounded-full object-cover border border-neutral-200 dark:border-neutral-700" data-alt="Headshot of Bob Smith" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsPe_Z_OdjvUnz5Qcj1ocjnGXr-EZxyvGc0cjpac7dndcQ1CK3cqpxosPEm3M0gwnV5TVRn4nQeO7KuiXe6dDUxwolH_OnqYObAPkHvleUcfihI05kZXV8tP-e1qoo_fwe3u99dX-qrDxb5_T0quuo6o7MTfFSHezb3hovUR3b4Cfg-azZEG8uqEo2xkQGs0p31Pj62iw0VyADW3SPXn_rCSR9DOBRo7y74_RrN9zymWgx4rRPPa8u7zX75x0QyRfe5bGUhOC63L49"/>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-neutral-700 dark:text-neutral-200 group-hover:text-primary transition-colors">Bob Smith</span>
+<span class="text-xs text-neutral-500 dark:text-neutral-400">CTO @ Globex</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-neutral-400 text-xl opacity-0 group-hover:opacity-100 transition-opacity">keyboard_return</span>
+</div>
+</div>
+<!-- SECTION: SEGMENTS -->
+<div class="mb-2 mt-4">
+<div class="px-3 py-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider sticky top-0 bg-surface-light dark:bg-surface-dark">
+                    Segments
+                </div>
+<div class="group flex items-center justify-between px-3 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer border-l-4 border-transparent transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
+<span class="material-symbols-outlined text-lg">pie_chart</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-neutral-700 dark:text-neutral-200 group-hover:text-primary transition-colors">Q3 High Value Targets</span>
+<span class="text-xs text-neutral-500 dark:text-neutral-400">Revenue &gt; $50k • Last Activity &lt; 30 days</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-neutral-400 text-xl opacity-0 group-hover:opacity-100 transition-opacity">keyboard_return</span>
+</div>
+<div class="group flex items-center justify-between px-3 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer border-l-4 border-transparent transition-colors mt-1">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700">
+<span class="material-symbols-outlined text-lg">warning</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-neutral-700 dark:text-neutral-200 group-hover:text-primary transition-colors">Churn Risk EMEA</span>
+<span class="text-xs text-neutral-500 dark:text-neutral-400">Usage Drop &gt; 20% • Location: EMEA</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-neutral-400 text-xl opacity-0 group-hover:opacity-100 transition-opacity">keyboard_return</span>
+</div>
+</div>
+<!-- SPECIAL ACTION: CREATE NEW -->
+<div class="mb-2 mt-4 border-t border-neutral-100 dark:border-neutral-800 pt-2">
+<div class="group flex items-center justify-between px-3 py-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg cursor-pointer border-l-4 border-transparent transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary border border-transparent">
+<span class="material-symbols-outlined text-lg">add</span>
+</div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-primary">Create new Company...</span>
+<span class="text-xs text-neutral-500 dark:text-neutral-400">Add a new record to CRM</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- FOOTER / SHORTCUTS -->
+<div class="px-4 py-3 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1">
+<kbd class="font-sans px-1.5 py-0.5 bg-white dark:bg-neutral-700 rounded border border-neutral-200 dark:border-neutral-600 shadow-sm min-w-[20px] text-center">↑</kbd>
+<kbd class="font-sans px-1.5 py-0.5 bg-white dark:bg-neutral-700 rounded border border-neutral-200 dark:border-neutral-600 shadow-sm min-w-[20px] text-center">↓</kbd>
+<span>to navigate</span>
+</span>
+<span class="flex items-center gap-1">
+<kbd class="font-sans px-1.5 py-0.5 bg-white dark:bg-neutral-700 rounded border border-neutral-200 dark:border-neutral-600 shadow-sm">↵</kbd>
+<span>to select</span>
+</span>
+</div>
+<div class="flex items-center gap-2">
+<span>Search by</span>
+<img alt="Algolia logo" class="h-4 opacity-50 grayscale" data-alt="Algolia logo placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZstlUYoSKX6r6QnSQWJodnD9vbzEXilPaK75ra8s7K7RVItuz6dEiaaXqnLt-9fNEVwi0DSU-vJg38CZ0UbPQGKwtkm3yu9F2Xw3gT-8U2F8-d0_FUX3DKjhBqWmq4qWTFlvSGKKBNSLeneMp1xwW24CmtIqvsTQoItJvDd1PtO3yor1XEVIeb5DyVPTSrPZ2mdSqu3noZszKdmLBCsAFOVFUcAiyPOi67ouJyddU-9Da_fcmKOvOHMXQ0uifmr2jDfseAfWnfMmy"/>
+</div>
+</div>
+</div>
+<!-- 
+      BACKGROUND PAGE MOCKUP 
+      To show context of "overlay"
+    -->
+<div aria-hidden="true" class="fixed inset-0 z-0 pointer-events-none opacity-20 filter blur-[2px]">
+<!-- Dashboard Header -->
+<div class="w-full h-16 bg-white border-b border-gray-200 flex items-center px-6">
+<div class="w-32 h-6 bg-gray-300 rounded"></div>
+<div class="ml-auto flex gap-4">
+<div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+<div class="w-8 h-8 bg-gray-300 rounded-full"></div>
+</div>
+</div>
+<!-- Dashboard Content -->
+<div class="flex h-full">
+<div class="w-64 bg-gray-50 border-r border-gray-200 h-full p-6 space-y-4">
+<div class="w-full h-4 bg-gray-200 rounded"></div>
+<div class="w-3/4 h-4 bg-gray-200 rounded"></div>
+<div class="w-5/6 h-4 bg-gray-200 rounded"></div>
+</div>
+<div class="flex-1 p-8 grid grid-cols-3 gap-6">
+<div class="col-span-3 h-32 bg-white rounded-lg border border-gray-200"></div>
+<div class="h-64 bg-white rounded-lg border border-gray-200"></div>
+<div class="h-64 bg-white rounded-lg border border-gray-200"></div>
+<div class="h-64 bg-white rounded-lg border border-gray-200"></div>
+</div>
+</div>
+</div>
+</body></html>

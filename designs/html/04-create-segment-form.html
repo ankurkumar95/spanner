@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Create New Segment - Spanner CRM</title>
+<!-- Tailwind Config -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "primary-50": "#eff6ff",
+                        "primary-100": "#dbeafe",
+                        "primary-200": "#bfdbfe",
+                        "primary-600": "#2563eb",
+                        "primary-700": "#1d4ed8",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                        "neutral-light": "#f3f4f6", 
+                        "neutral-dark": "#1f2937",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem", 
+                        "lg": "0.5rem", 
+                        "xl": "0.75rem", 
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-display">
+<!-- Top Navigation (Mock context) -->
+<header class="bg-white dark:bg-[#151c2a] border-b border-slate-200 dark:border-slate-800 h-16 flex items-center px-6 sticky top-0 z-30">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold">S</div>
+<span class="font-semibold text-lg tracking-tight">Spanner CRM</span>
+</div>
+<nav class="ml-10 hidden md:flex items-center gap-6 text-sm font-medium text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="hover:text-primary transition-colors" href="#">Accounts</a>
+<a class="text-primary" href="#">Segments</a>
+<a class="hover:text-primary transition-colors" href="#">Campaigns</a>
+</nav>
+<div class="ml-auto flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-icons-round">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border border-slate-300 dark:border-slate-600">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="Profile photo of a man smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAISeq5uh_d4NreYhvKucWBRVNFgQt4_KJJSOa7ZlMdd0ZgG_fHr90VAZZtUkyK3rbOhy-rJ8wOUanCngOVbgHQbnw2gd2fV8hIcX8Kou-BXDZFfJFPp1UUVEhjLioe-AGt3CjT0vSvXvJ8mCZDNOTZgxIO9a7euu_rWmE2Ypk9Ez3VdOcswcQNgjoTKbWMHvH-UR1y_XvMjUuCSjXPPOMK1smZFBXICMRMmsOoB1BwsLCSNepJnI4TFLt85x56Z86t0b0g1m4KvEBa"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 p-6 md:p-10 flex justify-center">
+<div class="w-full max-w-3xl">
+<!-- Breadcrumbs / Back Link -->
+<div class="mb-6">
+<a class="inline-flex items-center text-sm text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-primary transition-colors group" href="#">
+<span class="material-icons-round text-base mr-1 group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                    Back to Segments
+                </a>
+</div>
+<!-- Form Card -->
+<div class="bg-white dark:bg-[#151c2a] rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+<!-- Form Header -->
+<div class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-[#151c2a]">
+<h1 class="text-2xl font-semibold text-slate-900 dark:text-white">Create New Segment</h1>
+<p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Define a new audience segment for your ABM campaigns.</p>
+</div>
+<form class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Section 1: Segment Details -->
+<div class="px-8 py-8 space-y-6">
+<div class="grid grid-cols-1 gap-6">
+<!-- Name Input -->
+<div class="col-span-1">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" for="segment-name">
+                                    Segment Name <span class="text-red-500">*</span>
+</label>
+<input class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3 transition-colors placeholder:text-slate-400" id="segment-name" placeholder="e.g., Q3 Enterprise Tech Targets" type="text"/>
+</div>
+<!-- Description Input -->
+<div class="col-span-1">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" for="description">
+                                    Description
+                                </label>
+<textarea class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5 px-3 transition-colors placeholder:text-slate-400 resize-y" id="description" placeholder="Briefly describe the target criteria, goals, or persona for this segment..." rows="4"></textarea>
+<p class="mt-1.5 text-xs text-slate-500 dark:text-slate-400">Internal notes to help your team understand this segment's purpose.</p>
+</div>
+</div>
+</div>
+<!-- Section 2: Configuration (Offerings) -->
+<div class="px-8 py-8 space-y-6 bg-slate-50/50 dark:bg-slate-900/20">
+<div>
+<h3 class="text-base font-medium text-slate-900 dark:text-white">Configuration</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Associate products and set visibility.</p>
+</div>
+<!-- Multi-select Offerings -->
+<div>
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                                Associated Offerings
+                            </label>
+<!-- Fake Multi-Select Component -->
+<div class="relative">
+<div class="w-full min-h-[46px] rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all p-1.5 flex flex-wrap gap-2 items-center">
+<!-- Selected Tags -->
+<span class="inline-flex items-center px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/20 text-sm font-medium">
+                                        Cloud Infrastructure
+                                        <button class="ml-1.5 inline-flex text-primary/60 hover:text-primary focus:outline-none" type="button">
+<span class="material-icons-round text-sm">close</span>
+</button>
+</span>
+<span class="inline-flex items-center px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/20 text-sm font-medium">
+                                        Data Analytics Pro
+                                        <button class="ml-1.5 inline-flex text-primary/60 hover:text-primary focus:outline-none" type="button">
+<span class="material-icons-round text-sm">close</span>
+</button>
+</span>
+<!-- Input for searching -->
+<input class="flex-1 min-w-[120px] border-none bg-transparent p-1 text-sm focus:ring-0 text-slate-900 dark:text-white placeholder:text-slate-400" placeholder="Search offerings..." type="text"/>
+</div>
+<!-- Dropdown (Simulated Open State hint) -->
+<!-- 
+                                <div class="absolute z-10 mt-1 w-full rounded-md bg-white dark:bg-slate-800 shadow-lg border border-slate-200 dark:border-slate-700 py-1 hidden">
+                                   ... options ...
+                                </div> 
+                                -->
+<p class="mt-2 text-xs text-slate-500 dark:text-slate-400">Start typing to search for products or services available in your catalog.</p>
+</div>
+</div>
+<!-- Status Toggle -->
+<div class="flex items-center justify-between pt-2">
+<div class="flex flex-col">
+<span class="text-sm font-medium text-slate-900 dark:text-white">Segment Status</span>
+<span class="text-sm text-slate-500 dark:text-slate-400">Inactive segments are hidden from campaign builders.</span>
+</div>
+<!-- Toggle Switch -->
+<button aria-checked="true" class="group relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900" role="switch" type="button">
+<span class="sr-only">Use setting</span>
+<span aria-hidden="true" class="pointer-events-none inline-block h-5 w-5 translate-x-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out group-hover:shadow-md"></span>
+</button>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="px-8 py-6 bg-slate-50 dark:bg-[#121824] flex items-center justify-end gap-3 rounded-b-xl">
+<button class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition-all" type="button">
+                            Cancel
+                        </button>
+<button class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary border border-transparent rounded-lg shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition-all" type="submit">
+<span class="material-icons-round text-lg mr-2">save</span>
+                            Save Segment
+                        </button>
+</div>
+</form>
+</div>
+<!-- Contextual Help / Sidebar Info (Optional decorative element to balance layout) -->
+<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-3 p-4 rounded-lg border border-blue-100 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-800/50 flex gap-4 items-start">
+<span class="material-icons-round text-primary mt-0.5">info</span>
+<div>
+<h4 class="text-sm font-semibold text-blue-900 dark:text-blue-100">Pro Tip</h4>
+<p class="text-sm text-blue-800 dark:text-blue-200 mt-1">
+                            Segments with specific offering tags perform 24% better in ABM campaigns. Ensure your offering list is up to date in the Catalog module.
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Background Decoration -->
+<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-3xl"></div>
+<div class="absolute top-[20%] right-[10%] w-[20%] h-[20%] rounded-full bg-blue-400/5 blur-3xl"></div>
+</div>
+</body></html>

@@ -73,6 +73,7 @@ Before responding to your questions, based on the requirements we have figured o
 
 This looks good to me. So for now why don't we just update the requirements and prompts created and I can review the requirements once again.
 
+
 Now, you are an Experienced Product Manager, please review the requirements we have collected so far, find any gaps if you see. Ask me questions if you have have.
 
 ¸
@@ -81,3 +82,18 @@ Now, you are an Experienced Product Manager, please review the requirements we h
    Based on the exercise we did so far, I want to give a cool name to this project. To create the repositories, logos and everything. So can you suggest me a name around that?
 
    I want to go with the name of Spanner. Please update all the documents and requirement of whatever documents you have generated everywhere, including the mini CRM folder name.
+
+   I want to use Google Stitch to create the mock-ups, workflows, design, everything of the application. Can you give me a correct prompt so that it can create the the right screens for all the project to requirements we discussed so far? I want to supply the Google the Docs folder, you have created all the markdown files within the docs folder. So give me appropriate prompt so that I I can give it to the streets and it can create all the things in one go.
+
+
+   Yes, you have missed many logical screens like forgot password, reset password. Forms for adding contacts, segments and companies.
+
+   I don't know but can Stitch validate what it has created? So it seems like a lot of screens are missing in the design stitch has created. Can you please update g give me a relevant prompt for that?
+
+   I want to develop this application using Google Tools, so give me a appropriate prompt so that this duffer can understand what to do in one bow.
+
+   Whatever you have written in Google Dev Prompt, sh should I give in one go or I can split it into multiple tasks?
+
+   I don't think you under get this right. So I want to use the full capabilities of Jules. So give me suggest to me first that can this project be split into multiple agents so that multiple agents can work in parallel and s g give me the right prompts if possible.
+
+   Give me a list of designs I have in my Stitch account.

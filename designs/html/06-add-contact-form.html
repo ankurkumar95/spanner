@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add New Contact Form</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "primary-hover": "#104bc4", // slightly darker for hover states
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem", 
+                        "lg": "0.5rem", 
+                        "xl": "0.75rem", 
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for dropdowns */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200 min-h-screen flex flex-col">
+<!-- Top Navigation / Breadcrumbs -->
+<header class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+<nav class="flex items-center text-sm font-medium text-slate-500 dark:text-slate-400 mb-4">
+<a class="hover:text-primary dark:hover:text-primary transition-colors flex items-center" href="#">
+<span class="material-icons text-base mr-1">arrow_back</span>
+                Contacts
+            </a>
+<span class="mx-2 text-slate-300 dark:text-slate-600">/</span>
+<span class="text-slate-800 dark:text-slate-100">Add New</span>
+</nav>
+<div class="flex items-start justify-between">
+<div>
+<h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Add New Contact</h1>
+<p class="mt-1 text-slate-500 dark:text-slate-400">Enter the details below to manually create a new contact record.</p>
+</div>
+<!-- Decorative Icon -->
+<div class="hidden sm:flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
+<span class="material-icons text-2xl">person_add</span>
+</div>
+</div>
+</header>
+<!-- Main Content Form -->
+<main class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 flex-grow">
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+<!-- Progress / Section Indicator (Visual Flair) -->
+<div class="h-1 w-full bg-slate-100 dark:bg-slate-800">
+<div class="h-full w-1/3 bg-primary rounded-r-full"></div>
+</div>
+<form action="#" class="p-6 sm:p-8 lg:p-10 space-y-8" method="POST">
+<!-- Section 1: Personal Information -->
+<section>
+<div class="flex items-center gap-2 mb-6">
+<div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold">1</div>
+<h2 class="text-lg font-semibold text-slate-900 dark:text-white">Personal Information</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- First Name -->
+<div class="space-y-1.5">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="first-name">
+                                First Name <span class="text-red-500">*</span>
+</label>
+<input class="block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5" id="first-name" name="first-name" placeholder="e.g. Jane" type="text"/>
+</div>
+<!-- Last Name -->
+<div class="space-y-1.5">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="last-name">
+                                Last Name <span class="text-red-500">*</span>
+</label>
+<input class="block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5" id="last-name" name="last-name" placeholder="e.g. Doe" type="text"/>
+</div>
+<!-- Email Address -->
+<div class="space-y-1.5 md:col-span-2">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="email">
+                                Email Address <span class="text-red-500">*</span>
+</label>
+<div class="relative">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+<span class="material-icons text-slate-400 text-lg">mail_outline</span>
+</div>
+<input class="block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white pl-10 shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5" id="email" name="email" placeholder="jane.doe@example.com" type="email"/>
+<!-- Validation Message Placeholder -->
+<!-- <p class="mt-1 text-sm text-red-600 dark:text-red-400">Please enter a valid email address.</p> -->
+</div>
+</div>
+</div>
+</section>
+<hr class="border-slate-200 dark:border-slate-800"/>
+<!-- Section 2: Professional Details -->
+<section>
+<div class="flex items-center gap-2 mb-6">
+<div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold">2</div>
+<h2 class="text-lg font-semibold text-slate-900 dark:text-white">Professional Details</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Company (Searchable Dropdown) -->
+<div class="space-y-1.5 relative group">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="company">
+                                Company
+                            </label>
+<div class="relative">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+<span class="material-icons text-slate-400 text-lg">business</span>
+</div>
+<input autocomplete="off" class="block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white pl-10 pr-10 shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5" id="company" name="company" placeholder="Search company..." type="text"/>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3">
+<span class="material-icons text-slate-400 text-lg cursor-pointer">arrow_drop_down</span>
+</div>
+</div>
+<!-- Dropdown Menu (Hidden by default, shown for demo structure) -->
+<!-- To simulate active state in design, we can show it partially or just structure it for the dev -->
+<div class="absolute z-10 mt-1 w-full rounded-md bg-white dark:bg-slate-800 shadow-lg border border-slate-200 dark:border-slate-700 hidden group-focus-within:block">
+<ul class="max-h-60 overflow-auto py-1 text-base sm:text-sm custom-scrollbar" tabindex="-1">
+<li class="relative cursor-pointer select-none py-2 pl-3 pr-9 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700">
+<div class="flex items-center">
+<div class="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold mr-2">A</div>
+<span class="block truncate font-medium">Acme Corp</span>
+</div>
+</li>
+<li class="relative cursor-pointer select-none py-2 pl-3 pr-9 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700">
+<div class="flex items-center">
+<div class="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xs font-bold mr-2">G</div>
+<span class="block truncate">Global Industries</span>
+</div>
+</li>
+<li class="relative cursor-pointer select-none py-2 pl-3 pr-9 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700">
+<div class="flex items-center">
+<span class="material-icons text-slate-400 text-lg mr-2">add</span>
+<span class="block truncate text-primary">Add new company "Tech..."</span>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<!-- Job Title -->
+<div class="space-y-1.5">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="job-title">
+                                Job Title
+                            </label>
+<input class="block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm focus:border-primary focus:ring-primary sm:text-sm py-2.5" id="job-title" name="job-title" placeholder="e.g. Senior Marketing Manager" type="text"/>
+</div>
+<!-- LinkedIn URL -->
+<div class="space-y-1.5 md:col-span-2">
+<label class="block text-sm font-medium text-slate-700 dark:text-slate-300" for="linkedin">
+                                LinkedIn Profile
+                            </label>
+<div class="flex rounded-lg shadow-sm">
+<span class="inline-flex items-center rounded-l-lg border border-r-0 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 text-slate-500 dark:text-slate-400 sm:text-sm">
+                                    linkedin.com/in/
+                                </span>
+<input class="block w-full min-w-0 flex-1 rounded-none rounded-r-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:border-primary focus:ring-primary sm:text-sm py-2.5" id="linkedin" name="linkedin" placeholder="username" type="text"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Action Bar -->
+<div class="pt-6 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4">
+<button class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 font-medium text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400" type="button">
+                        Cancel
+                    </button>
+<div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+<button class="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-primary text-primary bg-primary/10 hover:bg-primary/20 font-medium text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900 flex items-center justify-center" name="action" type="submit" value="save_add_another">
+<span class="material-icons text-sm mr-2">playlist_add</span>
+                            Save &amp; Add Another
+                        </button>
+<button class="w-full sm:w-auto px-6 py-2.5 rounded-lg border border-transparent bg-primary hover:bg-primary-hover text-white font-medium text-sm shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900 flex items-center justify-center" name="action" type="submit" value="save">
+<span class="material-icons text-sm mr-2">check</span>
+                            Save Contact
+                        </button>
+</div>
+</div>
+</form>
+</div>
+</main>
+<!-- Simple Footer -->
+<footer class="w-full max-w-5xl mx-auto px-6 py-6 text-center text-xs text-slate-400 dark:text-slate-600">
+<p>© 2023 Contact Module. Secure Form.</p>
+</footer>
+</body></html>
