@@ -111,6 +111,31 @@ class UserWithRoles(UserBrief):
     model_config = ConfigDict(from_attributes=True)
 
 
+class UserRolesUpdate(BaseModel):
+    """Schema for updating user roles."""
+
+    roles: list[UserRoleEnum]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserListResponse(BaseModel):
+    """Paginated user list response."""
+
+    users: list[UserResponse]
+    total: int
+    page: int
+    per_page: int
+    total_pages: int
+
+
+class UserPermissionsResponse(BaseModel):
+    """User permissions response."""
+
+    user_id: str
+    permissions: list[str]
+
+
 class RoleGrantCreate(BaseModel):
     """Schema for creating a role grant."""
 

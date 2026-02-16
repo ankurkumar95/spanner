@@ -75,8 +75,6 @@ class ContactUpdate(BaseModel):
     data_requester_details: str | None = Field(None, max_length=500)
 
     company_id: UUID | None = None
-    status: ContactStatusEnum | None = None
-    assigned_sdr_id: UUID | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

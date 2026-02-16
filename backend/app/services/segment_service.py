@@ -108,7 +108,8 @@ async def list_segments(
     if status_filter:
         conditions.append(Segment.status == status_filter)
     if search:
-        conditions.append(Segment.name.ilike(f"%{search}%"))
+        escaped = search.replace("%", "\\%").replace("_", "\\_")
+        conditions.append(Segment.name.ilike(f"%{escaped}%"))
 
     if conditions:
         stmt = stmt.where(and_(*conditions))
@@ -143,7 +144,8 @@ async def count_segments(
     if status_filter:
         conditions.append(Segment.status == status_filter)
     if search:
-        conditions.append(Segment.name.ilike(f"%{search}%"))
+        escaped = search.replace("%", "\\%").replace("_", "\\_")
+        conditions.append(Segment.name.ilike(f"%{escaped}%"))
 
     if conditions:
         stmt = stmt.where(and_(*conditions))

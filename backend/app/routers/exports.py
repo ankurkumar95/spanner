@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import StreamingResponse
 
 from app.core.database import get_db
-from app.core.deps import get_current_active_user
+from app.core.deps import get_current_active_user, require_roles
 from app.services import export_service
 
 router = APIRouter()
@@ -17,7 +17,7 @@ async def export_companies_csv(
     segment_id: UUID | None = Query(None),
     status: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(require_roles("admin", "segment_owner", "researcher"))
 ):
     """
     Export companies to CSV format.
@@ -37,7 +37,7 @@ async def export_contacts_csv(
     segment_id: UUID | None = Query(None),
     status: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(require_roles("admin", "segment_owner", "researcher"))
 ):
     """
     Export contacts to CSV format.
@@ -55,7 +55,7 @@ async def export_contacts_csv(
 @router.get("/segments", response_class=StreamingResponse)
 async def export_segments_csv(
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(require_roles("admin", "segment_owner"))
 ):
     """
     Export all segments to CSV format.

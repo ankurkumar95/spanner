@@ -31,7 +31,7 @@ services:
       - ./backend:/app
     environment:
       DATABASE_URL: postgresql+asyncpg://spanner:spanner_dev_pwd@postgres:5432/spanner
-      SECRET_KEY: dev-secret-key-change-in-production-f8a3b2c1d4e5f6g7h8i9j0k1l2m3n4o5
+      SECRET_KEY: ${SECRET_KEY:-dev-secret-key-change-in-production}
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
       REFRESH_TOKEN_EXPIRE_DAYS: 7
       CORS_ORIGINS: http://localhost:5173,http://localhost:3000

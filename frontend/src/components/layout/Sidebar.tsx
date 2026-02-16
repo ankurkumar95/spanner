@@ -27,7 +27,7 @@ const workspaceNav = [
 ];
 
 const operationsNav = [
-  { to: '/approvals', icon: ClipboardCheck, label: 'Approval Queue', badge: 12 },
+  { to: '/approvals', icon: ClipboardCheck, label: 'Approval Queue' },
 ];
 
 const bottomNav = [
@@ -174,11 +174,6 @@ export default function Sidebar() {
               <item.icon className="mr-3 w-5 h-5" />
               {item.label}
             </div>
-            {item.badge && (
-              <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-0.5 rounded-full">
-                {item.badge}
-              </span>
-            )}
           </NavLink>
         ))}
       </nav>

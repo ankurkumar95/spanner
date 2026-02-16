@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { api } from '@/lib/api';
-import type { User, LoginRequest, LoginResponse } from '@/types';
+import type { User, LoginResponse } from '@/types';
 
 interface AuthState {
   user: User | null;
@@ -18,12 +18,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: !!localStorage.getItem('access_token'),
 
   login: async (email: string, password: string) => {
-    const response = await api.post<LoginResponse>('/auth/login', {
-      email,
-      password,
-    } as LoginRequest);
+    // Backend expects OAuth2 form-urlencoded with 'username' field
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
 
-    const { access_token, refresh_token, user } = response.data;
+    const response = await api.post<LoginResponse>('/auth/login', formData, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    const { access_token, refresh_token } = response.data;
 
     // Store tokens
     localStorage.setItem('access_token', access_token);
@@ -32,8 +36,11 @@ export const useAuthStore = create<AuthState>((set) => ({
     // Set axios default header
     api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
 
+    // Fetch user profile after login
+    const meResponse = await api.get<User>('/auth/me');
+
     set({
-      user,
+      user: meResponse.data,
       token: access_token,
       isAuthenticated: true,
     });

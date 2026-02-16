@@ -117,7 +117,8 @@ async def list_companies(
             return []
 
     if search is not None and search.strip():
-        query = query.where(Company.company_name.ilike(f"%{search}%"))
+        escaped = search.replace("%", "\\%").replace("_", "\\_")
+        query = query.where(Company.company_name.ilike(f"%{escaped}%"))
 
     if is_duplicate is not None:
         query = query.where(Company.is_duplicate == is_duplicate)
@@ -164,7 +165,8 @@ async def count_companies(
             return 0
 
     if search is not None and search.strip():
-        query = query.where(Company.company_name.ilike(f"%{search}%"))
+        escaped = search.replace("%", "\\%").replace("_", "\\_")
+        query = query.where(Company.company_name.ilike(f"%{escaped}%"))
 
     if is_duplicate is not None:
         query = query.where(Company.is_duplicate == is_duplicate)

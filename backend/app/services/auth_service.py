@@ -136,7 +136,7 @@ async def create_user(
     """)
     await db.execute(insert_prefs_query, {"user_id": user_id})
 
-    await db.commit()
+    await db.flush()
 
     return {
         "id": str(user_id),
@@ -211,7 +211,7 @@ async def update_user(
     if user_row is None:
         raise ValueError(f"User with id {user_id} not found")
 
-    await db.commit()
+    await db.flush()
 
     # Fetch roles
     roles = await _get_user_roles(db, user_id)
@@ -251,7 +251,7 @@ async def deactivate_user(db: AsyncSession, user_id: UUID) -> None:
     if user_row is None:
         raise ValueError(f"User with id {user_id} not found")
 
-    await db.commit()
+    await db.flush()
 
 
 async def activate_user(db: AsyncSession, user_id: UUID) -> None:
@@ -278,7 +278,7 @@ async def activate_user(db: AsyncSession, user_id: UUID) -> None:
     if user_row is None:
         raise ValueError(f"User with id {user_id} not found")
 
-    await db.commit()
+    await db.flush()
 
 
 async def get_user_by_id(db: AsyncSession, user_id: UUID) -> dict | None:
@@ -501,7 +501,7 @@ async def update_user_roles(db: AsyncSession, user_id: UUID, roles: list[str]) -
             if role_row:
                 assigned_roles.append(role_row[0])
 
-    await db.commit()
+    await db.flush()
 
     # Fetch updated user
     user = await get_user_by_id(db, user_id)

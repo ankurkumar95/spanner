@@ -109,7 +109,9 @@ class CompanyApproval(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     def model_post_init(self, __context):
-        """Validate that rejection_reason is provided when status is rejected."""
+        """Validate approval schema constraints."""
+        if self.status == CompanyStatusEnum.PENDING:
+            raise ValueError("Cannot set status back to 'pending'")
         if self.status == CompanyStatusEnum.REJECTED and not self.rejection_reason:
             raise ValueError("rejection_reason is required when status is 'rejected'")
         if self.status != CompanyStatusEnum.REJECTED and self.rejection_reason:

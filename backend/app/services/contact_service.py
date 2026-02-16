@@ -152,7 +152,8 @@ async def list_contacts(
         query = query.where(Contact.is_duplicate == is_duplicate)
 
     if search:
-        search_pattern = f"%{search}%"
+        escaped = search.replace("%", "\\%").replace("_", "\\_")
+        search_pattern = f"%{escaped}%"
         query = query.where(
             or_(
                 Contact.first_name.ilike(search_pattern),
@@ -215,7 +216,8 @@ async def count_contacts(
         query = query.where(Contact.is_duplicate == is_duplicate)
 
     if search:
-        search_pattern = f"%{search}%"
+        escaped = search.replace("%", "\\%").replace("_", "\\_")
+        search_pattern = f"%{escaped}%"
         query = query.where(
             or_(
                 Contact.first_name.ilike(search_pattern),
@@ -354,7 +356,9 @@ async def bulk_assign_to_sdr(
     sdr_id: UUID
 ) -> list[Contact]:
     """
-    Bulk assign multiple contacts to an SDR.
+    Bulk assign multiple contacts to an SDR (atomic).
+
+    Validates all contacts first before making any changes.
 
     Args:
         db: Database session
@@ -367,13 +371,30 @@ async def bulk_assign_to_sdr(
     Raises:
         ValueError: If any contact not found or has invalid status
     """
-    updated_contacts = []
-
+    # Phase 1: Validate all contacts exist and have correct status
+    contacts = []
     for contact_id in contact_ids:
-        contact = await assign_to_sdr(db, contact_id, sdr_id)
-        updated_contacts.append(contact)
+        contact = await get_contact(db, contact_id)
+        if contact is None:
+            raise ValueError(f"Contact {contact_id} not found")
+        if contact.status != ContactStatusEnum.APPROVED:
+            raise ValueError(
+                f"Contact {contact_id} has status '{contact.status.value}', "
+                f"must be 'approved' for assignment."
+            )
+        contacts.append(contact)
 
-    return updated_contacts
+    # Phase 2: Apply all assignments (only reached if all validations pass)
+    for contact in contacts:
+        contact.assigned_sdr_id = sdr_id
+        contact.status = ContactStatusEnum.ASSIGNED_TO_SDR
+
+    await db.flush()
+
+    for contact in contacts:
+        await db.refresh(contact, ["company", "segment"])
+
+    return contacts
 
 
 async def mark_meeting_scheduled(
