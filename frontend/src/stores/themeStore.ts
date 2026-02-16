@@ -1,17 +1,30 @@
 import { create } from 'zustand';
 
+type Theme = 'light' | 'dark';
+
 interface ThemeState {
-  sidebarTheme: 'light' | 'dark';
+  sidebarTheme: Theme;
   toggleSidebarTheme: () => void;
-  setSidebarTheme: (theme: 'light' | 'dark') => void;
+  setSidebarTheme: (theme: Theme) => void;
 }
 
 const THEME_STORAGE_KEY = 'spanner-sidebar-theme';
 
-const getInitialTheme = (): 'light' | 'dark' => {
+const getInitialTheme = (): Theme => {
   const stored = localStorage.getItem(THEME_STORAGE_KEY);
   return stored === 'dark' ? 'dark' : 'light';
 };
+
+const applyDarkClass = (theme: Theme) => {
+  if (theme === 'dark') {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+};
+
+// Apply initial theme on load
+applyDarkClass(getInitialTheme());
 
 export const useThemeStore = create<ThemeState>((set) => ({
   sidebarTheme: getInitialTheme(),
@@ -20,12 +33,14 @@ export const useThemeStore = create<ThemeState>((set) => ({
     set((state) => {
       const newTheme = state.sidebarTheme === 'light' ? 'dark' : 'light';
       localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+      applyDarkClass(newTheme);
       return { sidebarTheme: newTheme };
     });
   },
 
-  setSidebarTheme: (theme: 'light' | 'dark') => {
+  setSidebarTheme: (theme: Theme) => {
     localStorage.setItem(THEME_STORAGE_KEY, theme);
+    applyDarkClass(theme);
     set({ sidebarTheme: theme });
   },
 }));

@@ -66,7 +66,7 @@ export function Pagination({ total, skip, limit, onChange }: PaginationProps) {
   }
 
   return (
-    <div className="flex items-center justify-between border-t border-slate-200 bg-white px-4 py-3 sm:px-6">
+    <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 sm:px-6">
       <div className="flex flex-1 justify-between sm:hidden">
         <button
           onClick={handlePrevious}
@@ -95,7 +95,7 @@ export function Pagination({ total, skip, limit, onChange }: PaginationProps) {
       </div>
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm text-slate-700">
+          <p className="text-sm text-slate-700 dark:text-slate-300">
             Showing <span className="font-medium">{from}</span> to{' '}
             <span className="font-medium">{to}</span> of{' '}
             <span className="font-medium">{total}</span> results

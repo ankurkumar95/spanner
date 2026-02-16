@@ -25,6 +25,7 @@ export interface Segment {
   description: string | null;
   status: 'active' | 'archived';
   created_by: string;
+  created_by_name: string | null;
   created_at: string;
   updated_at: string;
   offerings: OfferingBrief[];
@@ -72,6 +73,7 @@ export interface Company {
   is_duplicate: boolean;
   batch_id: string | null;
   created_by: string;
+  created_by_name: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -95,6 +97,7 @@ export interface Contact {
   assigned_sdr_id: string | null;
   is_duplicate: boolean;
   created_by: string;
+  created_by_name: string | null;
   created_at: string;
   updated_at: string;
 }

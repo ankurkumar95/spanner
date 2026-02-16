@@ -77,11 +77,11 @@ export default function NotificationCenter() {
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-slate-200 z-50">
+        <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 z-50">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-slate-200">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-slate-900">Notifications</h3>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Notifications</h3>
               {unreadCount > 0 && (
                 <span className="inline-flex items-center rounded-full bg-primary-100 px-2 py-0.5 text-xs font-medium text-primary-700">
                   {unreadCount}
@@ -115,12 +115,12 @@ export default function NotificationCenter() {
                 <LoadingSpinner size="sm" />
               </div>
             ) : notifications && notifications.items.length > 0 ? (
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-slate-700">
                 {notifications.items.map((notification) => (
                   <button
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className="w-full text-left p-4 hover:bg-slate-50 transition-colors flex items-start gap-3 group"
+                    className="w-full text-left p-4 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-start gap-3 group"
                   >
                     {/* Unread Indicator */}
                     {!notification.is_read && (
@@ -128,19 +128,19 @@ export default function NotificationCenter() {
                     )}
 
                     {/* Icon */}
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-lg">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-lg">
                       {notificationIcons[notification.type as keyof typeof notificationIcons] || 'ℹ️'}
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900 mb-0.5">
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-0.5">
                         {notification.title}
                       </p>
-                      <p className="text-xs text-slate-600 line-clamp-2 mb-1">
+                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mb-1">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-400 dark:text-slate-500">
                         {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                       </p>
                     </div>
@@ -149,17 +149,17 @@ export default function NotificationCenter() {
               </div>
             ) : (
               <div className="py-12 text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-3">
-                  <Bell className="w-6 h-6 text-slate-400" />
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 mb-3">
+                  <Bell className="w-6 h-6 text-slate-400 dark:text-slate-500" />
                 </div>
-                <p className="text-sm text-slate-600">No new notifications</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400">No new notifications</p>
               </div>
             )}
           </div>
 
           {/* Footer */}
           {notifications && notifications.items.length > 0 && (
-            <div className="p-3 border-t border-slate-200">
+            <div className="p-3 border-t border-slate-200 dark:border-slate-700">
               <button
                 onClick={() => {
                   navigate('/notifications');

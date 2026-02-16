@@ -48,21 +48,21 @@ export function FilterBar({
           value={searchValue}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={searchPlaceholder}
-          className="block w-full rounded-lg border border-slate-300 bg-white py-2 pl-10 pr-3 text-sm placeholder-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          className="block w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 py-2 pl-10 pr-3 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
         />
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
         {filters.map((filter) => (
           <div key={filter.key} className="flex items-center gap-2">
-            <label htmlFor={filter.key} className="text-sm font-medium text-slate-700">
+            <label htmlFor={filter.key} className="text-sm font-medium text-slate-700 dark:text-slate-300">
               {filter.label}:
             </label>
             <select
               id={filter.key}
               value={filterValues[filter.key] || 'all'}
               onChange={(e) => onFilterChange?.(filter.key, e.target.value)}
-              className="block rounded-lg border border-slate-300 bg-white py-1.5 pl-3 pr-8 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              className="block rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 py-1.5 pl-3 pr-8 text-sm text-slate-900 dark:text-white focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
             >
               <option value="all">All</option>
               {filter.options.map((option) => (
@@ -77,7 +77,7 @@ export function FilterBar({
         {hasActiveFilters && (
           <button
             onClick={handleClear}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors duration-150"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors duration-150"
           >
             <X className="h-4 w-4" />
             Clear

@@ -61,10 +61,10 @@ export default function Header() {
   };
 
   return (
-    <header className="h-16 flex items-center justify-between px-8 bg-white border-b border-slate-200 shadow-sm z-10">
+    <header className="h-16 flex items-center justify-between px-8 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm z-10">
       {/* Page Title */}
       <div className="flex items-center">
-        <h1 className="text-xl font-semibold text-slate-800">{pageTitle}</h1>
+        <h1 className="text-xl font-semibold text-slate-800 dark:text-white">{pageTitle}</h1>
       </div>
 
       {/* Right Section */}
@@ -79,30 +79,30 @@ export default function Header() {
             });
             document.dispatchEvent(event);
           }}
-          className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm text-slate-500 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+          className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
         >
           <Search className="w-4 h-4" />
           <span>Search</span>
-          <kbd className="text-xs bg-slate-100 px-1.5 py-0.5 rounded border border-slate-300">⌘K</kbd>
+          <kbd className="text-xs bg-slate-100 dark:bg-slate-600 px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-600">⌘K</kbd>
         </button>
 
         {/* Notification Center */}
         <NotificationCenter />
 
         {/* Divider */}
-        <div className="h-6 w-px bg-slate-200"></div>
+        <div className="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
 
         {/* User Info & Menu */}
         {user && (
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="flex items-center gap-3 hover:bg-slate-50 rounded-lg px-3 py-2 transition-colors"
+              className="flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg px-3 py-2 transition-colors"
             >
               {/* User Details */}
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium text-slate-900">{user.name}</p>
-                <p className="text-xs text-slate-500">{user.email}</p>
+                <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{user.name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
               </div>
 
               {/* Avatar */}
@@ -121,25 +121,25 @@ export default function Header() {
 
             {/* Dropdown Menu */}
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50">
-                <div className="px-4 py-3 border-b border-slate-100">
-                  <p className="text-sm font-medium text-slate-900">{user.name}</p>
-                  <p className="text-xs text-slate-500 truncate">{user.email}</p>
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1 z-50">
+                <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-700">
+                  <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{user.name}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                 </div>
                 <button
                   onClick={() => {
                     navigate('/settings');
                     setIsUserMenuOpen(false);
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   <Settings className="w-4 h-4" />
                   Settings
                 </button>
-                <div className="border-t border-slate-100 mt-1 pt-1">
+                <div className="border-t border-slate-100 dark:border-slate-700 mt-1 pt-1">
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                   >
                     <LogOut className="w-4 h-4" />
                     Logout
@@ -154,8 +154,8 @@ export default function Header() {
         {!user && (
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-slate-900">Admin User</p>
-              <p className="text-xs text-slate-500">admin@spanner.app</p>
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Admin User</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">admin@spanner.app</p>
             </div>
             <div className="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border border-blue-200">
               AU

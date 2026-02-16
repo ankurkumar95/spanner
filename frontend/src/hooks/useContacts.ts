@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api';
 import {
   Contact,
-  PaginatedResponse,
 } from '../types';
 import toast from 'react-hot-toast';
 
@@ -16,20 +15,26 @@ interface ContactsParams {
   assigned_sdr_id?: string;
 }
 
+interface ContactListResponse {
+  contacts: Contact[];
+  total: number;
+  page: number;
+  per_page: number;
+  total_pages: number;
+}
+
 interface CreateContactData {
   first_name: string;
   last_name: string;
   email: string;
   company_id: string;
-  segment_id: string;
   mobile_phone?: string;
   job_title?: string;
   direct_phone_number?: string;
+  contact_linkedin_url?: string;
 }
 
-interface UpdateContactData extends Partial<CreateContactData> {
-  status?: 'uploaded' | 'approved' | 'assigned_to_sdr' | 'meeting_scheduled';
-}
+interface UpdateContactData extends Partial<CreateContactData> {}
 
 interface AssignContactData {
   sdr_id: string;
@@ -39,18 +44,27 @@ export function useContacts(params: ContactsParams = {}) {
   return useQuery({
     queryKey: ['contacts', params],
     queryFn: async () => {
-      const response = await api.get<PaginatedResponse<Contact>>('/contacts', {
+      // Contacts API uses page/per_page/status_filter params
+      // and returns { contacts, total, page, per_page, total_pages }
+      const page = Math.floor((params.skip || 0) / (params.limit || 20)) + 1;
+      const response = await api.get<ContactListResponse>('/contacts', {
         params: {
-          skip: params.skip || 0,
-          limit: params.limit || 20,
+          page,
+          per_page: params.limit || 20,
           search: params.search || undefined,
           company_id: params.company_id && params.company_id !== 'all' ? params.company_id : undefined,
           segment_id: params.segment_id && params.segment_id !== 'all' ? params.segment_id : undefined,
-          status: params.status && params.status !== 'all' ? params.status : undefined,
+          status_filter: params.status && params.status !== 'all' ? params.status : undefined,
           assigned_sdr_id: params.assigned_sdr_id && params.assigned_sdr_id !== 'all' ? params.assigned_sdr_id : undefined,
         },
       });
-      return response.data;
+      // Normalize to PaginatedResponse-like shape
+      return {
+        items: response.data.contacts,
+        total: response.data.total,
+        skip: params.skip || 0,
+        limit: params.limit || 20,
+      };
     },
   });
 }
@@ -110,11 +124,12 @@ export function useApproveContact() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.post<Contact>(`/contacts/${id}/approve`);
+      const response = await api.post<Contact>(`/contacts/${id}/approve`, { status: 'approved' });
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      queryClient.invalidateQueries({ queryKey: ['contact', data.id] });
       toast.success('Contact approved successfully');
     },
     onError: (error: unknown) => {

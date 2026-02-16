@@ -71,7 +71,7 @@ async def get_company(
     query = (
         select(Company)
         .where(Company.id == company_id)
-        .options(selectinload(Company.segment))
+        .options(selectinload(Company.segment), selectinload(Company.created_by_user))
     )
 
     result = await db.execute(query)
@@ -102,7 +102,7 @@ async def list_companies(
     Returns:
         List of company instances
     """
-    query = select(Company).options(selectinload(Company.segment))
+    query = select(Company).options(selectinload(Company.segment), selectinload(Company.created_by_user))
 
     # Apply filters
     if segment_id is not None:
@@ -271,7 +271,7 @@ async def get_pending_companies(
     query = (
         select(Company)
         .where(Company.status == CompanyStatusEnum.PENDING)
-        .options(selectinload(Company.segment))
+        .options(selectinload(Company.segment), selectinload(Company.created_by_user))
         .order_by(Company.created_at.asc())
         .offset(skip)
         .limit(limit)
@@ -352,7 +352,7 @@ async def get_companies_by_segment(
     query = (
         select(Company)
         .where(Company.segment_id == segment_id)
-        .options(selectinload(Company.segment))
+        .options(selectinload(Company.segment), selectinload(Company.created_by_user))
         .order_by(Company.created_at.desc())
         .offset(skip)
         .limit(limit)

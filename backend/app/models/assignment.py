@@ -30,7 +30,7 @@ class Assignment(Base, UUIDPKMixin):
     __tablename__ = "assignments"
 
     entity_type: Mapped[EntityTypeEnum] = mapped_column(
-        SAEnum(EntityTypeEnum, name="entity_type", create_type=False),
+        SAEnum(EntityTypeEnum, name="entity_type", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False
     )
     # Note: entity_id has no FK constraint (polymorphic relationship)

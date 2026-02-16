@@ -104,6 +104,7 @@ class ContactResponse(ContactBase):
     is_duplicate: bool
     batch_id: UUID | None
     created_by: UUID
+    created_by_name: str | None = None
     created_at: datetime
     updated_at: datetime
 

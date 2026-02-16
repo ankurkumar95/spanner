@@ -31,7 +31,7 @@ router = APIRouter()
 
 # Segment Endpoints
 
-@router.get("/segments/", response_model=list[SegmentResponse])
+@router.get("/segments/")
 async def list_segments(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(50, ge=1, le=100, description="Maximum number of records to return"),
@@ -41,7 +41,7 @@ async def list_segments(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    List segments with pagination and optional filters.
+    List segments with pagination, optional filters, and stats.
 
     Requires authentication.
     """
@@ -53,16 +53,26 @@ async def list_segments(
         search=search
     )
 
-    # Get total count for pagination metadata
-    total = await segment_service.count_segments(
-        db=db,
-        status_filter=status,
-        search=search
-    )
+    # Build response with stats for each segment
+    result = []
+    for segment in segments:
+        stats = await segment_service.get_segment_stats(db=db, segment_id=segment.id)
+        result.append(SegmentWithStats(
+            id=segment.id,
+            name=segment.name,
+            description=segment.description,
+            status=segment.status,
+            created_by=segment.created_by,
+            created_by_name=segment.created_by_name,
+            created_at=segment.created_at,
+            updated_at=segment.updated_at,
+            offerings=segment.offerings,
+            company_count=stats["company_count"],
+            contact_count=stats["contact_count"],
+            pending_company_count=stats["pending_company_count"],
+        ))
 
-    # Note: For production, you'd typically return pagination metadata in headers
-    # or wrap the response. Keeping it simple here as per schema requirements.
-    return segments
+    return result
 
 
 @router.post("/segments/", response_model=SegmentResponse, status_code=status.HTTP_201_CREATED)
@@ -126,6 +136,7 @@ async def get_segment(
         "description": segment.description,
         "status": segment.status,
         "created_by": segment.created_by,
+        "created_by_name": segment.created_by_name,
         "created_at": segment.created_at,
         "updated_at": segment.updated_at,
         "offerings": segment.offerings,
@@ -223,11 +234,12 @@ async def list_offerings(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(50, ge=1, le=100, description="Maximum number of records to return"),
     status: OfferingStatusEnum | None = Query(None, description="Filter by status"),
+    search: str | None = Query(None, description="Search by offering name (case-insensitive)"),
     current_user: dict = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db)
 ):
     """
-    List all offerings with pagination and optional status filter.
+    List all offerings with pagination, optional status filter, and search.
 
     Requires authentication.
     """
@@ -235,7 +247,8 @@ async def list_offerings(
         db=db,
         skip=skip,
         limit=limit,
-        status_filter=status
+        status_filter=status,
+        search=search
     )
 
     return offerings

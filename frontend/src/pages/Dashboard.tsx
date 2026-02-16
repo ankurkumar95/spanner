@@ -25,11 +25,11 @@ const colorClasses = {
 
 function StatCard({ title, value, icon: Icon, trend, color }: StatCardProps) {
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-slate-600 mb-1">{title}</p>
-          <p className="text-3xl font-bold text-slate-900">{value.toLocaleString()}</p>
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">{title}</p>
+          <p className="text-3xl font-bold text-slate-900 dark:text-slate-100">{value.toLocaleString()}</p>
           {trend && (
             <div className="flex items-center gap-1 mt-2">
               <TrendingUp
@@ -66,10 +66,10 @@ function PipelineStage({ label, count, percentage }: PipelineStageProps) {
     <div className="flex-1">
       <div className="mb-2">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-medium text-slate-700">{label}</span>
-          <span className="text-xs font-bold text-slate-900">{count}</span>
+          <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{label}</span>
+          <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{count}</span>
         </div>
-        <div className="w-full bg-slate-200 rounded-full h-2">
+        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
           <div
             className="bg-primary-600 h-2 rounded-full transition-all duration-500"
             style={{ width: `${percentage}%` }}
@@ -127,8 +127,8 @@ export default function Dashboard() {
     <div className="p-8 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Dashboard</h1>
-        <p className="text-slate-600">Welcome back! Here's what's happening with your CRM.</p>
+        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Dashboard</h1>
+        <p className="text-slate-600 dark:text-slate-400">Welcome back! Here's what's happening with your CRM.</p>
       </div>
 
       {/* KPI Cards */}
@@ -157,10 +157,10 @@ export default function Dashboard() {
           </div>
 
           {/* Pipeline Velocity */}
-          <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 shadow-sm">
             <div className="mb-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-1">Contact Pipeline Velocity</h2>
-              <p className="text-sm text-slate-600">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Contact Pipeline Velocity</h2>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Track the progression of contacts through your sales pipeline
               </p>
             </div>
@@ -178,18 +178,18 @@ export default function Dashboard() {
             </div>
 
             {/* Pipeline Summary */}
-            <div className="mt-6 pt-6 border-t border-slate-200 grid grid-cols-3 gap-4">
+            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-3 gap-4">
               <div className="text-center">
-                <p className="text-2xl font-bold text-slate-900">{contactsByStatus.uploaded}</p>
-                <p className="text-xs text-slate-600 mt-1">Awaiting Approval</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{contactsByStatus.uploaded}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Awaiting Approval</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-slate-900">{assignedContacts}</p>
-                <p className="text-xs text-slate-600 mt-1">Assigned to SDRs</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{assignedContacts}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Assigned to SDRs</p>
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-slate-900">{meetingScheduled}</p>
-                <p className="text-xs text-slate-600 mt-1">Meetings Scheduled</p>
+                <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{meetingScheduled}</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Meetings Scheduled</p>
               </div>
             </div>
           </div>
@@ -197,9 +197,9 @@ export default function Dashboard() {
           {/* Recent Activity & Quick Actions */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Recent Activity */}
-            <div className="lg:col-span-2 bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
+            <div className="lg:col-span-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 shadow-sm">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-semibold text-slate-900">Recent Activity</h2>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Activity</h2>
                 <button
                   onClick={() => navigate('/companies')}
                   className="text-sm text-primary-600 hover:text-primary-700 font-medium"
@@ -232,14 +232,14 @@ export default function Dashboard() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-slate-900">{activity.name}</p>
-                            <p className="text-xs text-slate-600">
+                            <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{activity.name}</p>
+                            <p className="text-xs text-slate-600 dark:text-slate-400">
                               {activity.type === 'company' ? 'Company' : 'Contact'} created
                             </p>
                           </div>
                           <StatusBadge status={activity.status} />
                         </div>
-                        <p className="text-xs text-slate-400 mt-1">
+                        <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                           {formatDistanceToNow(new Date(activity.created_at), { addSuffix: true })}
                         </p>
                       </div>
@@ -248,55 +248,55 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-3">
-                    <FileText className="w-6 h-6 text-slate-400" />
+                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 mb-3">
+                    <FileText className="w-6 h-6 text-slate-400 dark:text-slate-500" />
                   </div>
-                  <p className="text-sm text-slate-600">No recent activity</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">No recent activity</p>
                 </div>
               )}
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-slate-900 mb-6">Quick Actions</h2>
+            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 shadow-sm">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">Quick Actions</h2>
               <div className="space-y-3">
                 <button
                   onClick={() => navigate('/companies')}
-                  className="w-full flex items-center gap-3 px-4 py-3 border border-slate-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors text-left group"
+                  className="w-full flex items-center gap-3 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-slate-700 dark:hover:border-slate-600 transition-colors text-left group"
                 >
                   <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 text-green-600 flex items-center justify-center group-hover:bg-green-200 transition-colors">
                     <Upload className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-900">Upload Companies</p>
-                    <p className="text-xs text-slate-500">Import new company data</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Upload Companies</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Import new company data</p>
                   </div>
                 </button>
 
                 <button
                   onClick={() => navigate('/contacts')}
-                  className="w-full flex items-center gap-3 px-4 py-3 border border-slate-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors text-left group"
+                  className="w-full flex items-center gap-3 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-slate-700 dark:hover:border-slate-600 transition-colors text-left group"
                 >
                   <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center group-hover:bg-purple-200 transition-colors">
                     <Upload className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-900">Upload Contacts</p>
-                    <p className="text-xs text-slate-500">Import new contact data</p>
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100">Upload Contacts</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Import new contact data</p>
                   </div>
                 </button>
 
                 <button
                   onClick={() => navigate('/approvals')}
-                  className="w-full flex items-center gap-3 px-4 py-3 border border-slate-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-colors text-left group"
+                  className="w-full flex items-center gap-3 px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-primary-300 hover:bg-primary-50 dark:hover:bg-slate-700 dark:hover:border-slate-600 transition-colors text-left group"
                 >
                   <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center group-hover:bg-orange-200 transition-colors">
                     <CheckCircle className="w-5 h-5" />
                   </div>
                   <div className="flex items-center justify-between flex-1">
                     <div>
-                      <p className="text-sm font-medium text-slate-900">View Approvals</p>
-                      <p className="text-xs text-slate-500">Review pending items</p>
+                      <p className="text-sm font-medium text-slate-900 dark:text-slate-100">View Approvals</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">Review pending items</p>
                     </div>
                     {totalPendingApprovals > 0 && (
                       <span className="inline-flex items-center rounded-full bg-orange-100 px-2.5 py-0.5 text-xs font-medium text-orange-700">

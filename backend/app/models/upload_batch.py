@@ -37,7 +37,7 @@ class UploadBatch(Base, UUIDPKMixin):
     __tablename__ = "upload_batches"
 
     upload_type: Mapped[UploadTypeEnum] = mapped_column(
-        SAEnum(UploadTypeEnum, name="upload_type", create_type=False),
+        SAEnum(UploadTypeEnum, name="upload_type", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         index=True
     )
@@ -47,7 +47,7 @@ class UploadBatch(Base, UUIDPKMixin):
     valid_rows: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     invalid_rows: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     status: Mapped[BatchStatusEnum] = mapped_column(
-        SAEnum(BatchStatusEnum, name="batch_status", create_type=False),
+        SAEnum(BatchStatusEnum, name="batch_status", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=BatchStatusEnum.PROCESSING,
         server_default="processing",

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Plus, ExternalLink, MapPin, Users, Upload as UploadIcon, Package } from 'lucide-react';
+import { Plus, ExternalLink, MapPin, Users, Upload as UploadIcon, Package, X, Settings, Tag, Search, Phone, Linkedin, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
-import { useCompanies, useCompany } from '../hooks/useCompanies';
+import { useCompanies, useCompany, useCreateCompany } from '../hooks/useCompanies';
 import { useSegments } from '../hooks/useSegments';
 import {
   DataTable,
@@ -22,8 +22,10 @@ export default function Companies() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const limit = 20;
+  const createCompany = useCreateCompany();
 
   const { data, isLoading } = useCompanies({
     skip,
@@ -59,6 +61,40 @@ export default function Companies() {
     setStatusFilter('all');
   };
 
+  const handleCreateCompany = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const company_name = formData.get('company_name') as string;
+    const segment_id = formData.get('segment_id') as string;
+    const company_website = formData.get('company_website') as string;
+    const company_phone = formData.get('company_phone') as string;
+    const company_linkedin_url = formData.get('company_linkedin_url') as string;
+    const company_industry = formData.get('company_industry') as string;
+    const company_sub_industry = formData.get('company_sub_industry') as string;
+    const employee_size_range = formData.get('employee_size_range') as string;
+    const revenue_range = formData.get('revenue_range') as string;
+    const founded_year_str = formData.get('founded_year') as string;
+
+    try {
+      await createCompany.mutateAsync({
+        company_name,
+        segment_id,
+        company_website: company_website || undefined,
+        company_phone: company_phone || undefined,
+        company_linkedin_url: company_linkedin_url ? `https://linkedin.com/company/${company_linkedin_url}` : undefined,
+        company_industry: company_industry || undefined,
+        company_sub_industry: company_sub_industry || undefined,
+        employee_size_range: employee_size_range || undefined,
+        revenue_range: revenue_range || undefined,
+        founded_year: founded_year_str ? parseInt(founded_year_str, 10) : undefined,
+      });
+      setIsCreateModalOpen(false);
+      e.currentTarget.reset();
+    } catch (error) {
+      // Error is handled by the mutation's onError
+    }
+  };
+
   const columns: ColumnConfig<CompanyWithContacts>[] = [
     {
       key: 'company_name',
@@ -66,7 +102,7 @@ export default function Companies() {
       width: '20%',
       sortable: true,
       render: (item) => (
-        <div className="font-medium text-slate-900">{item.company_name}</div>
+        <div className="font-medium text-slate-900 dark:text-slate-100">{item.company_name}</div>
       ),
     },
     {
@@ -74,7 +110,7 @@ export default function Companies() {
       header: 'Industry',
       width: '15%',
       render: (item) => (
-        <div className="text-slate-600">{item.company_industry || '—'}</div>
+        <div className="text-slate-600 dark:text-slate-400">{item.company_industry || '—'}</div>
       ),
     },
     {
@@ -142,7 +178,7 @@ export default function Companies() {
       width: '15%',
       sortable: true,
       render: (item) => (
-        <span className="text-slate-600">
+        <span className="text-slate-600 dark:text-slate-400">
           {format(new Date(item.created_at), 'MMM d, yyyy')}
         </span>
       ),
@@ -174,20 +210,23 @@ export default function Companies() {
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Companies</h1>
-              <p className="mt-1 text-sm text-slate-600">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Companies</h1>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                 Manage companies across all segments
               </p>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => setIsUploadModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white text-slate-700 text-sm font-medium rounded-lg border border-slate-300 hover:bg-slate-50 transition-colors duration-150"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150"
               >
                 <UploadIcon className="h-4 w-4" />
                 Upload CSV
               </button>
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-150">
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-150"
+              >
                 <Plus className="h-4 w-4" />
                 Add Company
               </button>
@@ -249,14 +288,14 @@ export default function Companies() {
                     <label className="block text-xs font-medium text-slate-400 mb-1">
                       Company Name
                     </label>
-                    <p className="text-sm text-slate-900 font-medium">{selectedCompany.company_name}</p>
+                    <p className="text-sm text-slate-900 dark:text-slate-100 font-medium">{selectedCompany.company_name}</p>
                   </div>
                   {selectedCompany.company_description && (
                     <div>
                       <label className="block text-xs font-medium text-slate-400 mb-1">
                         Description
                       </label>
-                      <p className="text-sm text-slate-900">{selectedCompany.company_description}</p>
+                      <p className="text-sm text-slate-900 dark:text-slate-100">{selectedCompany.company_description}</p>
                     </div>
                   )}
                   <div>
@@ -277,10 +316,10 @@ export default function Companies() {
 
               {/* Contact Information */}
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Contact Information</h3>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Contact Information</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Website</span>
+                    <span className="text-slate-600 dark:text-slate-400">Website</span>
                     {selectedCompany.company_website ? (
                       <a
                         href={selectedCompany.company_website}
@@ -296,8 +335,8 @@ export default function Companies() {
                     )}
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Phone</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Phone</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
                       {selectedCompany.company_phone || '—'}
                     </span>
                   </div>
@@ -322,35 +361,35 @@ export default function Companies() {
 
               {/* Industry & Size */}
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Industry & Size</h3>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Industry & Size</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Industry</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Industry</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
                       {selectedCompany.company_industry || '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Sub-Industry</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Sub-Industry</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
                       {selectedCompany.company_sub_industry || '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Employee Size</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Employee Size</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
                       {selectedCompany.employee_size_range || '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Revenue Range</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Revenue Range</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
                       {selectedCompany.revenue_range || '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Founded</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Founded</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
                       {selectedCompany.founded_year || '—'}
                     </span>
                   </div>
@@ -359,8 +398,8 @@ export default function Companies() {
 
               {/* Location */}
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Location</h3>
-                <div className="space-y-1 text-sm text-slate-900">
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Location</h3>
+                <div className="space-y-1 text-sm text-slate-900 dark:text-slate-100">
                   {selectedCompany.street && <p>{selectedCompany.street}</p>}
                   <p>
                     {[
@@ -377,23 +416,23 @@ export default function Companies() {
 
               {/* Stats */}
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Statistics</h3>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Statistics</h3>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-slate-50 rounded-lg">
+                  <div className="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
-                      <Users className="h-4 w-4 text-slate-400" />
-                      <span className="text-xs font-medium text-slate-600">Contacts</span>
+                      <Users className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Contacts</span>
                     </div>
-                    <p className="text-xl font-semibold text-slate-900">
+                    <p className="text-xl font-semibold text-slate-900 dark:text-slate-100">
                       {selectedCompany.contact_count}
                     </p>
                   </div>
-                  <div className="p-3 bg-slate-50 rounded-lg">
+                  <div className="p-3 bg-slate-50 dark:bg-slate-700 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
-                      <Package className="h-4 w-4 text-slate-400" />
-                      <span className="text-xs font-medium text-slate-600">Batch ID</span>
+                      <Package className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Batch ID</span>
                     </div>
-                    <p className="text-xs font-medium text-slate-900 truncate">
+                    <p className="text-xs font-medium text-slate-900 dark:text-slate-100 truncate">
                       {selectedCompany.batch_id || '—'}
                     </p>
                   </div>
@@ -402,23 +441,23 @@ export default function Companies() {
 
               {/* Metadata */}
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Metadata</h3>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Metadata</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Created</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Created</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
                       {format(new Date(selectedCompany.created_at), 'MMM d, yyyy h:mm a')}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Last Updated</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Last Updated</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">
                       {format(new Date(selectedCompany.updated_at), 'MMM d, yyyy h:mm a')}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Created By</span>
-                    <span className="text-slate-900 font-medium">{selectedCompany.created_by}</span>
+                    <span className="text-slate-600 dark:text-slate-400">Created By</span>
+                    <span className="text-slate-900 dark:text-slate-100 font-medium">{selectedCompany.created_by_name || selectedCompany.created_by}</span>
                   </div>
                 </div>
               </div>
@@ -432,6 +471,332 @@ export default function Companies() {
           uploadType="company"
           segmentId={segmentFilter !== 'all' ? segmentFilter : undefined}
         />
+
+        {/* Create Modal */}
+        {isCreateModalOpen && (
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4">
+              <div
+                className="fixed inset-0 bg-slate-900/50 transition-opacity"
+                onClick={() => setIsCreateModalOpen(false)}
+              />
+              <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full">
+                {/* Header */}
+                <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                        Add New Company
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                        Manually enter details to track a new organization in your CRM.
+                      </p>
+                      <div className="mt-3 h-1 w-16 bg-primary-600 rounded-full" />
+                    </div>
+                    <button
+                      onClick={() => setIsCreateModalOpen(false)}
+                      className="text-slate-400 hover:text-slate-500 dark:text-slate-500 dark:hover:text-slate-400 transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+
+                <form onSubmit={handleCreateCompany} className="p-6 space-y-6">
+                  {/* Section 1: Core Details */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Settings className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                        Core Details
+                      </h3>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Basic identification information
+                    </p>
+
+                    <div>
+                      <label
+                        htmlFor="segment_id"
+                        className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                      >
+                        Segment <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500 pointer-events-none" />
+                        <select
+                          id="segment_id"
+                          name="segment_id"
+                          required
+                          className="w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none"
+                        >
+                          <option value="">Select a segment...</option>
+                          {segmentsData?.items.map((segment) => (
+                            <option key={segment.id} value={segment.id}>
+                              {segment.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                        Every company must belong to a segment.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="company_name"
+                        className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                      >
+                        Company Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="company_name"
+                        name="company_name"
+                        required
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="e.g. Acme Corp"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="company_website"
+                        className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                      >
+                        Website URL
+                      </label>
+                      <div className="flex">
+                        <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-sm">
+                          https://
+                        </span>
+                        <input
+                          type="text"
+                          id="company_website"
+                          name="company_website"
+                          className="flex-1 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-r-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="www.example.com"
+                        />
+                      </div>
+                      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                        We'll automatically fetch the logo based on the domain.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="company_phone"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          Phone
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Phone className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                          </div>
+                          <input
+                            type="tel"
+                            id="company_phone"
+                            name="company_phone"
+                            className="w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            placeholder="+1 (555) 000-0000"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="company_linkedin_url"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          LinkedIn
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Linkedin className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                          </div>
+                          <input
+                            type="text"
+                            id="company_linkedin_url"
+                            name="company_linkedin_url"
+                            className="w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            placeholder="linkedin.com/company/..."
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section 2: Classification */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Tag className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                        Classification
+                      </h3>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Categorize the company for better segmentation.
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="company_industry"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          Industry
+                        </label>
+                        <select
+                          id="company_industry"
+                          name="company_industry"
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                          <option value="">Select an industry</option>
+                          <option value="Technology">Technology</option>
+                          <option value="Healthcare">Healthcare</option>
+                          <option value="Financial Services">Financial Services</option>
+                          <option value="Manufacturing">Manufacturing</option>
+                          <option value="Retail">Retail</option>
+                          <option value="Education">Education</option>
+                          <option value="Energy">Energy</option>
+                          <option value="Media & Entertainment">Media & Entertainment</option>
+                          <option value="Real Estate">Real Estate</option>
+                          <option value="Professional Services">Professional Services</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="company_sub_industry"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          Sub-Industry
+                        </label>
+                        <input
+                          type="text"
+                          id="company_sub_industry"
+                          name="company_sub_industry"
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="e.g. Cloud Computing"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label
+                          htmlFor="employee_size_range"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          Headcount
+                        </label>
+                        <select
+                          id="employee_size_range"
+                          name="employee_size_range"
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                          <option value="">Select range</option>
+                          <option value="1-10">1-10</option>
+                          <option value="11-50">11-50</option>
+                          <option value="51-200">51-200</option>
+                          <option value="201-500">201-500</option>
+                          <option value="501-1000">501-1000</option>
+                          <option value="1001-5000">1001-5000</option>
+                          <option value="5000+">5000+</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="revenue_range"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          Revenue Range
+                        </label>
+                        <select
+                          id="revenue_range"
+                          name="revenue_range"
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                          <option value="">Select range</option>
+                          <option value="< $1M">{"< $1M"}</option>
+                          <option value="$1M - $10M">$1M - $10M</option>
+                          <option value="$10M - $50M">$10M - $50M</option>
+                          <option value="$50M - $100M">$50M - $100M</option>
+                          <option value="$100M - $500M">$100M - $500M</option>
+                          <option value="$500M - $1B">$500M - $1B</option>
+                          <option value="> $1B">{"> $1B"}</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="founded_year"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          Founded Year
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Calendar className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                          </div>
+                          <input
+                            type="number"
+                            id="founded_year"
+                            name="founded_year"
+                            min="1800"
+                            max="2100"
+                            className="w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            placeholder="e.g. 2015"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Footer */}
+                  <div className="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
+                    <div className="flex justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setIsCreateModalOpen(false)}
+                        className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={createCompany.isPending}
+                        className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {createCompany.isPending ? 'Adding...' : 'Add Company'}
+                      </button>
+                    </div>
+                    <p className="text-xs text-center text-slate-500 dark:text-slate-400">
+                      Need to import multiple companies?{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsCreateModalOpen(false);
+                          setIsUploadModalOpen(true);
+                        }}
+                        className="text-primary-600 hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors"
+                      >
+                        Upload a CSV file
+                      </button>{' '}
+                      instead.
+                    </p>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

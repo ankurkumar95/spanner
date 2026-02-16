@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { CheckCircle, XCircle, ExternalLink, MapPin } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, MapPin, AlertTriangle } from 'lucide-react';
 import { useCompanies, useCompany, useApproveCompany, useRejectCompany } from '../hooks/useCompanies';
 import { useContacts, useContact, useApproveContact } from '../hooks/useContacts';
 import {
@@ -48,6 +48,13 @@ export default function Approvals() {
     activeTab === 'contacts' && selectedId ? selectedId : ''
   );
 
+  // Fetch parent company for selected contact to check approval status
+  const { data: contactParentCompany } = useCompany(
+    activeTab === 'contacts' && selectedContact ? selectedContact.company_id : ''
+  );
+
+  const isParentCompanyApproved = contactParentCompany?.status === 'approved';
+
   const approveCompany = useApproveCompany();
   const rejectCompany = useRejectCompany();
   const approveContact = useApproveContact();
@@ -92,7 +99,7 @@ export default function Approvals() {
       header: 'Company Name',
       width: '25%',
       render: (item) => (
-        <div className="font-medium text-slate-900">{item.company_name}</div>
+        <div className="font-medium text-slate-900 dark:text-white">{item.company_name}</div>
       ),
     },
     {
@@ -100,7 +107,7 @@ export default function Approvals() {
       header: 'Industry',
       width: '20%',
       render: (item) => (
-        <div className="text-slate-600">{item.company_industry || '—'}</div>
+        <div className="text-slate-600 dark:text-slate-400">{item.company_industry || '—'}</div>
       ),
     },
     {
@@ -120,7 +127,7 @@ export default function Approvals() {
             <ExternalLink className="h-3 w-3 flex-shrink-0" />
           </a>
         ) : (
-          <span className="text-slate-400">—</span>
+          <span className="text-slate-400 dark:text-slate-500">—</span>
         ),
     },
     {
@@ -132,10 +139,10 @@ export default function Approvals() {
           .filter(Boolean)
           .join(', ');
         return (
-          <div className="flex items-center gap-1.5 text-slate-600">
+          <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
             {location ? (
               <>
-                <MapPin className="h-3.5 w-3.5 text-slate-400" />
+                <MapPin className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                 <span className="truncate max-w-[120px]">{location}</span>
               </>
             ) : (
@@ -150,7 +157,7 @@ export default function Approvals() {
       header: 'Uploaded',
       width: '15%',
       render: (item) => (
-        <span className="text-slate-600">
+        <span className="text-slate-600 dark:text-slate-400">
           {format(new Date(item.created_at), 'MMM d, yyyy')}
         </span>
       ),
@@ -197,7 +204,7 @@ export default function Approvals() {
       header: 'Uploaded',
       width: '20%',
       render: (item) => (
-        <span className="text-slate-600">
+        <span className="text-slate-600 dark:text-slate-400">
           {format(new Date(item.created_at), 'MMM d, yyyy')}
         </span>
       ),
@@ -208,26 +215,26 @@ export default function Approvals() {
     <div className="p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">Approval Queue</h1>
-          <p className="mt-1 text-sm text-slate-600">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Approval Queue</h1>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
             Review and approve pending companies and contacts
           </p>
         </div>
 
         <div className="mb-6">
-          <div className="border-b border-slate-200">
+          <div className="border-b border-slate-200 dark:border-slate-700">
             <nav className="-mb-px flex gap-8">
               <button
                 onClick={() => handleTabChange('companies')}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-150 ${
                   activeTab === 'companies'
                     ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
                 Companies
                 {companiesData && (
-                  <span className="ml-2 py-0.5 px-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
+                  <span className="ml-2 py-0.5 px-2 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
                     {companiesData.total}
                   </span>
                 )}
@@ -237,12 +244,12 @@ export default function Approvals() {
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-150 ${
                   activeTab === 'contacts'
                     ? 'border-primary-500 text-primary-600'
-                    : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600'
                 }`}
               >
                 Contacts
                 {contactsData && (
-                  <span className="ml-2 py-0.5 px-2 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
+                  <span className="ml-2 py-0.5 px-2 rounded-full text-xs font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400">
                     {contactsData.total}
                   </span>
                 )}
@@ -319,31 +326,31 @@ export default function Approvals() {
           ) : activeTab === 'companies' && selectedCompany ? (
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Company Information</h3>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Company Information</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                       Company Name
                     </label>
-                    <p className="text-sm text-slate-900 font-medium">{selectedCompany.company_name}</p>
+                    <p className="text-sm text-slate-900 dark:text-white font-medium">{selectedCompany.company_name}</p>
                   </div>
                   {selectedCompany.company_description && (
                     <div>
-                      <label className="block text-xs font-medium text-slate-400 mb-1">
+                      <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                         Description
                       </label>
-                      <p className="text-sm text-slate-900">{selectedCompany.company_description}</p>
+                      <p className="text-sm text-slate-900 dark:text-white">{selectedCompany.company_description}</p>
                     </div>
                   )}
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                       Status
                     </label>
                     <StatusBadge status={selectedCompany.status} />
                   </div>
                   {selectedCompany.is_duplicate && (
-                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                      <p className="text-xs font-medium text-amber-800">
+                    <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+                      <p className="text-xs font-medium text-amber-800 dark:text-amber-400">
                         This company is marked as a potential duplicate
                       </p>
                     </div>
@@ -352,10 +359,10 @@ export default function Approvals() {
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Contact Information</h3>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Contact Information</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Website</span>
+                    <span className="text-slate-600 dark:text-slate-400">Website</span>
                     {selectedCompany.company_website ? (
                       <a
                         href={selectedCompany.company_website}
@@ -367,12 +374,12 @@ export default function Approvals() {
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     ) : (
-                      <span className="text-slate-400">—</span>
+                      <span className="text-slate-400 dark:text-slate-500">—</span>
                     )}
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Phone</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Phone</span>
+                    <span className="text-slate-900 dark:text-white font-medium">
                       {selectedCompany.company_phone || '—'}
                     </span>
                   </div>
@@ -380,23 +387,23 @@ export default function Approvals() {
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Industry & Size</h3>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Industry & Size</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Industry</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Industry</span>
+                    <span className="text-slate-900 dark:text-white font-medium">
                       {selectedCompany.company_industry || '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Employee Size</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Employee Size</span>
+                    <span className="text-slate-900 dark:text-white font-medium">
                       {selectedCompany.employee_size_range || '—'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Revenue Range</span>
-                    <span className="text-slate-900 font-medium">
+                    <span className="text-slate-600 dark:text-slate-400">Revenue Range</span>
+                    <span className="text-slate-900 dark:text-white font-medium">
                       {selectedCompany.revenue_range || '—'}
                     </span>
                   </div>
@@ -404,8 +411,8 @@ export default function Approvals() {
               </div>
 
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Location</h3>
-                <div className="space-y-1 text-sm text-slate-900">
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Location</h3>
+                <div className="space-y-1 text-sm text-slate-900 dark:text-white">
                   {selectedCompany.street && <p>{selectedCompany.street}</p>}
                   <p>
                     {[
@@ -421,7 +428,7 @@ export default function Approvals() {
               </div>
 
               {!showRejectForm && (
-                <div className="flex gap-3 pt-4 border-t border-slate-200">
+                <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
                   <button
                     onClick={() => setShowRejectForm(true)}
                     disabled={approveCompany.isPending || rejectCompany.isPending}
@@ -442,9 +449,9 @@ export default function Approvals() {
               )}
 
               {showRejectForm && (
-                <div className="space-y-4 pt-4 border-t border-slate-200">
+                <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Rejection Reason *
                     </label>
                     <textarea
@@ -452,7 +459,7 @@ export default function Approvals() {
                       onChange={(e) => setRejectionReason(e.target.value)}
                       rows={3}
                       placeholder="Please provide a reason for rejection..."
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-slate-700 dark:text-white"
                     />
                   </div>
                   <div className="flex gap-3">
@@ -462,7 +469,7 @@ export default function Approvals() {
                         setRejectionReason('');
                       }}
                       disabled={rejectCompany.isPending}
-                      className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Cancel
                     </button>
@@ -480,49 +487,49 @@ export default function Approvals() {
           ) : activeTab === 'contacts' && selectedContact ? (
             <div className="space-y-6">
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Contact Information</h3>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Contact Information</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                       Full Name
                     </label>
-                    <p className="text-sm text-slate-900 font-medium">
+                    <p className="text-sm text-slate-900 dark:text-white font-medium">
                       {selectedContact.first_name} {selectedContact.last_name}
                     </p>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                       Email
                     </label>
-                    <p className="text-sm text-slate-900">{selectedContact.email}</p>
+                    <p className="text-sm text-slate-900 dark:text-white">{selectedContact.email}</p>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                       Job Title
                     </label>
-                    <p className="text-sm text-slate-900">{selectedContact.job_title || '—'}</p>
+                    <p className="text-sm text-slate-900 dark:text-white">{selectedContact.job_title || '—'}</p>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                       Mobile Phone
                     </label>
-                    <p className="text-sm text-slate-900">{selectedContact.mobile_phone || '—'}</p>
+                    <p className="text-sm text-slate-900 dark:text-white">{selectedContact.mobile_phone || '—'}</p>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                       Direct Phone
                     </label>
-                    <p className="text-sm text-slate-900">{selectedContact.direct_phone_number || '—'}</p>
+                    <p className="text-sm text-slate-900 dark:text-white">{selectedContact.direct_phone_number || '—'}</p>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">
+                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                       Status
                     </label>
                     <StatusBadge status={selectedContact.status} />
                   </div>
                   {selectedContact.is_duplicate && (
-                    <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                      <p className="text-xs font-medium text-amber-800">
+                    <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+                      <p className="text-xs font-medium text-amber-800 dark:text-amber-400">
                         This contact is marked as a potential duplicate
                       </p>
                     </div>
@@ -530,31 +537,62 @@ export default function Approvals() {
                 </div>
               </div>
 
+              {/* Parent Company Status */}
               <div>
-                <h3 className="text-sm font-medium text-slate-500 mb-3">Metadata</h3>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Company</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-600">Created</span>
-                    <span className="text-slate-900 font-medium">
-                      {format(new Date(selectedContact.created_at), 'MMM d, yyyy h:mm a')}
+                    <span className="text-slate-600 dark:text-slate-400">Company Name</span>
+                    <span className="text-slate-900 dark:text-white font-medium">
+                      {contactParentCompany?.company_name || '—'}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Created By</span>
-                    <span className="text-slate-900 font-medium">{selectedContact.created_by}</span>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Company Status</span>
+                    {contactParentCompany ? (
+                      <StatusBadge status={contactParentCompany.status} />
+                    ) : (
+                      <span className="text-slate-400 dark:text-slate-500">—</span>
+                    )}
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end pt-4 border-t border-slate-200">
-                <button
-                  onClick={handleApproveContact}
-                  disabled={approveContact.isPending}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  {approveContact.isPending ? 'Approving...' : 'Approve'}
-                </button>
+              <div>
+                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Metadata</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">Created</span>
+                    <span className="text-slate-900 dark:text-white font-medium">
+                      {format(new Date(selectedContact.created_at), 'MMM d, yyyy h:mm a')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">Created By</span>
+                    <span className="text-slate-900 dark:text-white font-medium">{selectedContact.created_by_name || selectedContact.created_by}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
+                {!isParentCompanyApproved && (
+                  <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+                    <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-xs font-medium text-amber-800 dark:text-amber-400">
+                      The parent company must be approved before this contact can be approved.
+                    </p>
+                  </div>
+                )}
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleApproveContact}
+                    disabled={approveContact.isPending || !isParentCompanyApproved}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    {approveContact.isPending ? 'Approving...' : 'Approve'}
+                  </button>
+                </div>
               </div>
             </div>
           ) : null}

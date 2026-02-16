@@ -41,7 +41,7 @@ export function useCompanies(params: CompaniesParams = {}) {
   return useQuery({
     queryKey: ['companies', params],
     queryFn: async () => {
-      const response = await api.get<PaginatedResponse<CompanyWithContacts>>('/companies', {
+      const response = await api.get<PaginatedResponse<CompanyWithContacts>>('/companies/', {
         params: {
           skip: params.skip || 0,
           limit: params.limit || 20,
@@ -72,7 +72,7 @@ export function useCreateCompany() {
 
   return useMutation({
     mutationFn: async (data: CreateCompanyData) => {
-      const response = await api.post<Company>('/companies', data);
+      const response = await api.post<Company>('/companies/', data);
       return response.data;
     },
     onSuccess: () => {
@@ -111,11 +111,12 @@ export function useApproveCompany() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await api.post<Company>(`/companies/${id}/approve`);
+      const response = await api.post<Company>(`/companies/${id}/approve`, { status: 'approved' });
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['companies'] });
+      queryClient.invalidateQueries({ queryKey: ['company', data.id] });
       toast.success('Company approved successfully');
     },
     onError: (error: unknown) => {
@@ -130,7 +131,7 @@ export function useRejectCompany() {
 
   return useMutation({
     mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
-      const response = await api.post<Company>(`/companies/${id}/reject`, { rejection_reason: reason });
+      const response = await api.post<Company>(`/companies/${id}/approve`, { status: 'rejected', rejection_reason: reason });
       return response.data;
     },
     onSuccess: () => {

@@ -70,7 +70,7 @@ class Contact(BaseModel):
         index=True
     )
     status: Mapped[ContactStatusEnum] = mapped_column(
-        SAEnum(ContactStatusEnum, name="contact_status", create_type=False),
+        SAEnum(ContactStatusEnum, name="contact_status", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=ContactStatusEnum.UPLOADED,
         server_default="uploaded",
@@ -122,6 +122,13 @@ class Contact(BaseModel):
             name="unique_contact_per_company"
         ),
     )
+
+    @property
+    def created_by_name(self) -> str | None:
+        """Return the name of the user who created this contact."""
+        if self.created_by_user:
+            return self.created_by_user.name
+        return None
 
     def __repr__(self) -> str:
         return f"<Contact(id={self.id}, name={self.first_name} {self.last_name}, email={self.email})>"

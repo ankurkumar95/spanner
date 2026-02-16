@@ -17,7 +17,7 @@ export function useNotifications(params: NotificationsParams = {}) {
   return useQuery({
     queryKey: ['notifications', params],
     queryFn: async () => {
-      const response = await api.get<PaginatedResponse<Notification>>('/notifications', {
+      const response = await api.get<PaginatedResponse<Notification>>('/notifications/', {
         params: {
           skip: params.skip || 0,
           limit: params.limit || 20,
@@ -65,7 +65,7 @@ export function useMarkAllNotificationsRead() {
 
   return useMutation({
     mutationFn: async () => {
-      const response = await api.post('/notifications/read-all');
+      const response = await api.post('/notifications/mark-all-read');
       return response.data;
     },
     onSuccess: () => {

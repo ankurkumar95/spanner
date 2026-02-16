@@ -62,8 +62,8 @@ export default function SettingsPage() {
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Settings</h1>
-          <p className="text-slate-600">Manage your account settings and preferences</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Settings</h1>
+          <p className="text-slate-600 dark:text-slate-400">Manage your account settings and preferences</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -78,8 +78,8 @@ export default function SettingsPage() {
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                       activeTab === tab.id
-                        ? 'bg-primary-50 text-primary-900 font-medium'
-                        : 'text-slate-700 hover:bg-slate-50'
+                        ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-900 dark:text-primary-300 font-medium'
+                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Icon className="w-5 h-5" />
@@ -92,36 +92,36 @@ export default function SettingsPage() {
 
           {/* Content Area */}
           <div className="lg:col-span-3">
-            <div className="bg-white border border-slate-200 rounded-lg shadow-sm">
+            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm">
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <div className="p-6 space-y-6">
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-900 mb-4">Profile Information</h2>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Profile Information</h2>
 
                     {/* User Info Display */}
                     <div className="space-y-4 mb-8">
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-                        <div className="text-sm text-slate-900 bg-slate-50 rounded-lg px-4 py-2.5 border border-slate-200">
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Name</label>
+                        <div className="text-sm text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800 rounded-lg px-4 py-2.5 border border-slate-200 dark:border-slate-700">
                           {user?.name || 'Admin User'}
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                        <div className="text-sm text-slate-900 bg-slate-50 rounded-lg px-4 py-2.5 border border-slate-200">
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email</label>
+                        <div className="text-sm text-slate-900 dark:text-white bg-slate-50 dark:bg-slate-800 rounded-lg px-4 py-2.5 border border-slate-200 dark:border-slate-700">
                           {user?.email || 'admin@spanner.app'}
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Roles</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Roles</label>
                         <div className="flex flex-wrap gap-2">
                           {(user?.roles || ['Admin']).map((role) => (
                             <span
                               key={role}
-                              className="inline-flex items-center rounded-md bg-primary-50 px-2.5 py-1 text-sm font-medium text-primary-700 ring-1 ring-inset ring-primary-700/10"
+                              className="inline-flex items-center rounded-md bg-primary-50 dark:bg-primary-900/30 px-2.5 py-1 text-sm font-medium text-primary-700 dark:text-primary-300 ring-1 ring-inset ring-primary-700/10 dark:ring-primary-500/20"
                             >
                               {role}
                             </span>
@@ -132,11 +132,11 @@ export default function SettingsPage() {
                   </div>
 
                   {/* Change Password Form */}
-                  <div className="pt-6 border-t border-slate-200">
-                    <h3 className="text-base font-semibold text-slate-900 mb-4">Change Password</h3>
+                  <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-4">Change Password</h3>
                     <form onSubmit={handleChangePassword} className="space-y-4">
                       <div>
-                        <label htmlFor="current-password" className="block text-sm font-medium text-slate-700 mb-1">
+                        <label htmlFor="current-password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                           Current Password
                         </label>
                         <input
@@ -144,13 +144,13 @@ export default function SettingsPage() {
                           id="current-password"
                           value={currentPassword}
                           onChange={(e) => setCurrentPassword(e.target.value)}
-                          className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20"
+                          className="w-full rounded-lg border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white px-4 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20"
                           required
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="new-password" className="block text-sm font-medium text-slate-700 mb-1">
+                        <label htmlFor="new-password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                           New Password
                         </label>
                         <input
@@ -158,15 +158,15 @@ export default function SettingsPage() {
                           id="new-password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20"
+                          className="w-full rounded-lg border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white px-4 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20"
                           required
                           minLength={8}
                         />
-                        <p className="mt-1 text-xs text-slate-500">Must be at least 8 characters</p>
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Must be at least 8 characters</p>
                       </div>
 
                       <div>
-                        <label htmlFor="confirm-password" className="block text-sm font-medium text-slate-700 mb-1">
+                        <label htmlFor="confirm-password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                           Confirm New Password
                         </label>
                         <input
@@ -174,7 +174,7 @@ export default function SettingsPage() {
                           id="confirm-password"
                           value={confirmPassword}
                           onChange={(e) => setConfirmPassword(e.target.value)}
-                          className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20"
+                          className="w-full rounded-lg border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white px-4 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20"
                           required
                         />
                       </div>
@@ -195,43 +195,43 @@ export default function SettingsPage() {
               {activeTab === 'preferences' && (
                 <div className="p-6 space-y-6">
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-900 mb-4">Preferences</h2>
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Preferences</h2>
 
                     {/* Theme Toggle */}
                     <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-3">Appearance</label>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Appearance</label>
                         <button
                           onClick={toggleSidebarTheme}
-                          className="flex items-center justify-between w-full px-4 py-3 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors"
+                          className="flex items-center justify-between w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                         >
                           <div className="flex items-center gap-3">
                             {sidebarTheme === 'dark' ? (
-                              <Moon className="w-5 h-5 text-slate-700" />
+                              <Moon className="w-5 h-5 text-slate-700 dark:text-slate-300" />
                             ) : (
-                              <Sun className="w-5 h-5 text-slate-700" />
+                              <Sun className="w-5 h-5 text-slate-700 dark:text-slate-300" />
                             )}
                             <div className="text-left">
-                              <p className="text-sm font-medium text-slate-900">Sidebar Theme</p>
-                              <p className="text-xs text-slate-500">
+                              <p className="text-sm font-medium text-slate-900 dark:text-white">Theme</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">
                                 Current: {sidebarTheme === 'dark' ? 'Dark' : 'Light'}
                               </p>
                             </div>
                           </div>
-                          <div className="text-xs text-primary-600 font-medium">Toggle</div>
+                          <div className="text-xs text-primary-600 dark:text-primary-400 font-medium">Toggle</div>
                         </button>
                       </div>
 
                       {/* Items Per Page */}
                       <div>
-                        <label htmlFor="items-per-page" className="block text-sm font-medium text-slate-700 mb-2">
+                        <label htmlFor="items-per-page" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                           Items Per Page
                         </label>
                         <select
                           id="items-per-page"
                           value={itemsPerPage}
                           onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                          className="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20"
+                          className="w-full rounded-lg border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white px-4 py-2 text-sm focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20"
                         >
                           <option value={10}>10</option>
                           <option value={20}>20</option>
@@ -243,51 +243,51 @@ export default function SettingsPage() {
                   </div>
 
                   {/* Notification Preferences */}
-                  <div className="pt-6 border-t border-slate-200">
-                    <h3 className="text-base font-semibold text-slate-900 mb-4">Notifications</h3>
+                  <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-4">Notifications</h3>
                     <div className="space-y-3">
-                      <label className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                      <label className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <div>
-                          <p className="text-sm font-medium text-slate-900">Email Notifications</p>
-                          <p className="text-xs text-slate-500">Receive email updates</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">Email Notifications</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Receive email updates</p>
                         </div>
                         <input
                           type="checkbox"
                           checked={emailNotifications}
                           onChange={(e) => setEmailNotifications(e.target.checked)}
-                          className="w-4 h-4 text-primary-600 rounded border-slate-300 focus:ring-primary-500"
+                          className="w-4 h-4 text-primary-600 rounded border-slate-300 dark:border-slate-600 focus:ring-primary-500"
                         />
                       </label>
 
-                      <label className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                      <label className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <div>
-                          <p className="text-sm font-medium text-slate-900">Push Notifications</p>
-                          <p className="text-xs text-slate-500">Receive browser notifications</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">Push Notifications</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Receive browser notifications</p>
                         </div>
                         <input
                           type="checkbox"
                           checked={pushNotifications}
                           onChange={(e) => setPushNotifications(e.target.checked)}
-                          className="w-4 h-4 text-primary-600 rounded border-slate-300 focus:ring-primary-500"
+                          className="w-4 h-4 text-primary-600 rounded border-slate-300 dark:border-slate-600 focus:ring-primary-500"
                         />
                       </label>
 
-                      <label className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                      <label className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <div>
-                          <p className="text-sm font-medium text-slate-900">Assignment Notifications</p>
-                          <p className="text-xs text-slate-500">Notify when assigned new items</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">Assignment Notifications</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">Notify when assigned new items</p>
                         </div>
                         <input
                           type="checkbox"
                           checked={assignmentNotifications}
                           onChange={(e) => setAssignmentNotifications(e.target.checked)}
-                          className="w-4 h-4 text-primary-600 rounded border-slate-300 focus:ring-primary-500"
+                          className="w-4 h-4 text-primary-600 rounded border-slate-300 dark:border-slate-600 focus:ring-primary-500"
                         />
                       </label>
                     </div>
                   </div>
 
-                  <div className="pt-6 border-t border-slate-200">
+                  <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
                     <button
                       onClick={handleSavePreferences}
                       className="inline-flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
@@ -302,62 +302,62 @@ export default function SettingsPage() {
               {/* About Tab */}
               {activeTab === 'about' && (
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold text-slate-900 mb-4">About Spanner CRM</h2>
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">About Spanner CRM</h2>
 
                   <div className="space-y-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-lg bg-primary-100 flex items-center justify-center">
-                        <span className="text-2xl font-bold text-primary-700">S</span>
+                      <div className="w-16 h-16 rounded-lg bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                        <span className="text-2xl font-bold text-primary-700 dark:text-primary-300">S</span>
                       </div>
                       <div>
-                        <h3 className="text-base font-semibold text-slate-900">Spanner CRM</h3>
-                        <p className="text-sm text-slate-600">Version 1.0.0</p>
+                        <h3 className="text-base font-semibold text-slate-900 dark:text-white">Spanner CRM</h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Version 1.0.0</p>
                       </div>
                     </div>
 
-                    <div className="pt-6 border-t border-slate-200 space-y-4">
+                    <div className="pt-6 border-t border-slate-200 dark:border-slate-700 space-y-4">
                       <div>
-                        <h4 className="text-sm font-medium text-slate-700 mb-1">Build Information</h4>
-                        <p className="text-sm text-slate-600">Version: 1.0.0</p>
-                        <p className="text-sm text-slate-600">Environment: Production</p>
+                        <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Build Information</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Version: 1.0.0</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Environment: Production</p>
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-medium text-slate-700 mb-2">Technology Stack</h4>
+                        <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Technology Stack</h4>
                         <div className="flex flex-wrap gap-2">
-                          <span className="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                          <span className="inline-flex items-center rounded-md bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-300">
                             React 19
                           </span>
-                          <span className="inline-flex items-center rounded-md bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+                          <span className="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/30 px-2.5 py-1 text-xs font-medium text-green-700 dark:text-green-300">
                             TypeScript
                           </span>
-                          <span className="inline-flex items-center rounded-md bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700">
+                          <span className="inline-flex items-center rounded-md bg-purple-50 dark:bg-purple-900/30 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-300">
                             Vite
                           </span>
-                          <span className="inline-flex items-center rounded-md bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">
+                          <span className="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-300">
                             TailwindCSS
                           </span>
-                          <span className="inline-flex items-center rounded-md bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700">
+                          <span className="inline-flex items-center rounded-md bg-orange-50 dark:bg-orange-900/30 px-2.5 py-1 text-xs font-medium text-orange-700 dark:text-orange-300">
                             TanStack Query
                           </span>
-                          <span className="inline-flex items-center rounded-md bg-pink-50 px-2.5 py-1 text-xs font-medium text-pink-700">
+                          <span className="inline-flex items-center rounded-md bg-pink-50 dark:bg-pink-900/30 px-2.5 py-1 text-xs font-medium text-pink-700 dark:text-pink-300">
                             Zustand
                           </span>
                         </div>
                       </div>
 
                       <div>
-                        <h4 className="text-sm font-medium text-slate-700 mb-2">Support</h4>
+                        <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Support</h4>
                         <div className="space-y-2">
                           <a
                             href="mailto:support@spanner.app"
-                            className="block text-sm text-primary-600 hover:text-primary-700"
+                            className="block text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                           >
                             support@spanner.app
                           </a>
                           <a
                             href="/docs"
-                            className="block text-sm text-primary-600 hover:text-primary-700"
+                            className="block text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                           >
                             Documentation
                           </a>
@@ -365,8 +365,8 @@ export default function SettingsPage() {
                       </div>
                     </div>
 
-                    <div className="pt-6 border-t border-slate-200">
-                      <p className="text-xs text-slate-500">
+                    <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         © 2024 Spanner CRM. All rights reserved.
                       </p>
                     </div>

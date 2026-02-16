@@ -100,14 +100,14 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="fixed inset-0 bg-slate-900/50 transition-opacity" onClick={handleClose} />
 
-        <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full">
-          <div className="flex items-center justify-between p-6 border-b border-slate-200">
-            <h2 className="text-xl font-semibold text-slate-900">
+        <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full">
+          <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
               Upload {uploadType === 'company' ? 'Companies' : 'Contacts'}
             </h2>
             <button
               onClick={handleClose}
-              className="text-slate-400 hover:text-slate-500 transition-colors duration-150"
+              className="text-slate-400 hover:text-slate-500 dark:hover:text-slate-300 transition-colors duration-150"
             >
               <X className="h-5 w-5" />
             </button>
@@ -118,14 +118,14 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
               <div className="space-y-6">
                 {uploadType === 'company' && (
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                       Segment *
                     </label>
                     <select
                       value={selectedSegment}
                       onChange={(e) => setSelectedSegment(e.target.value)}
                       disabled={!!segmentId}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     >
                       <option value="">Select a segment</option>
                       {segmentsData?.items.map((segment) => (
@@ -138,7 +138,7 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     CSV File *
                   </label>
                   <div
@@ -147,8 +147,8 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
                     onDrop={handleDrop}
                     className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-150 ${
                       isDragging
-                        ? 'border-primary-500 bg-primary-50'
-                        : 'border-slate-300 hover:border-slate-400'
+                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                        : 'border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500'
                     }`}
                   >
                     {file ? (
@@ -157,8 +157,8 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
                           <FileText className="h-12 w-12 text-primary-600" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-slate-900">{file.name}</p>
-                          <p className="text-xs text-slate-500 mt-1">{formatFileSize(file.size)}</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{file.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{formatFileSize(file.size)}</p>
                         </div>
                         <button
                           onClick={() => setFile(null)}
@@ -170,10 +170,10 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
                     ) : (
                       <div className="space-y-3">
                         <div className="flex items-center justify-center">
-                          <Upload className="h-12 w-12 text-slate-400" />
+                          <Upload className="h-12 w-12 text-slate-400 dark:text-slate-500" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-slate-900">
+                          <p className="text-sm font-medium text-slate-900 dark:text-slate-100">
                             Drop your CSV file here, or{' '}
                             <button
                               onClick={() => fileInputRef.current?.click()}
@@ -182,7 +182,7 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
                               browse
                             </button>
                           </p>
-                          <p className="text-xs text-slate-500 mt-1">CSV files only</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">CSV files only</p>
                         </div>
                       </div>
                     )}
@@ -226,24 +226,24 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
                 </div>
 
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
                     Upload {uploadResult.status === 'completed' ? 'Completed' : uploadResult.status === 'failed' ? 'Failed' : 'Processing'}
                   </h3>
-                  <p className="text-sm text-slate-600">{uploadResult.file_name}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{uploadResult.file_name}</p>
                 </div>
 
-                <div className="bg-slate-50 rounded-lg p-4 space-y-3">
+                <div className="bg-slate-50 dark:bg-slate-700 rounded-lg p-4 space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Total Rows</span>
-                    <span className="font-medium text-slate-900">{uploadResult.total_rows}</span>
+                    <span className="text-slate-600 dark:text-slate-400">Total Rows</span>
+                    <span className="font-medium text-slate-900 dark:text-slate-100">{uploadResult.total_rows}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Valid Rows</span>
-                    <span className="font-medium text-green-600">{uploadResult.valid_rows}</span>
+                    <span className="text-slate-600 dark:text-slate-400">Valid Rows</span>
+                    <span className="font-medium text-green-600 dark:text-green-400">{uploadResult.valid_rows}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Invalid Rows</span>
-                    <span className="font-medium text-red-600">{uploadResult.invalid_rows}</span>
+                    <span className="text-slate-600 dark:text-slate-400">Invalid Rows</span>
+                    <span className="font-medium text-red-600 dark:text-red-400">{uploadResult.invalid_rows}</span>
                   </div>
                 </div>
 

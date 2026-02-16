@@ -92,7 +92,7 @@ async def get_contact(db: AsyncSession, contact_id: UUID) -> Contact | None:
     """
     result = await db.execute(
         select(Contact)
-        .options(selectinload(Contact.company), selectinload(Contact.segment))
+        .options(selectinload(Contact.company), selectinload(Contact.segment), selectinload(Contact.created_by_user))
         .where(Contact.id == contact_id)
     )
     return result.scalar_one_or_none()
@@ -128,7 +128,8 @@ async def list_contacts(
     """
     query = select(Contact).options(
         selectinload(Contact.company),
-        selectinload(Contact.segment)
+        selectinload(Contact.segment),
+        selectinload(Contact.created_by_user)
     )
 
     # Apply filters

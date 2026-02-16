@@ -96,6 +96,7 @@ class SegmentResponse(SegmentBrief):
 
     description: str | None
     created_by: UUID
+    created_by_name: str | None = None
     created_at: datetime
     updated_at: datetime
     offerings: list[OfferingBrief] = Field(default_factory=list)

@@ -74,7 +74,7 @@ async def get_segment(db: AsyncSession, segment_id: UUID) -> Segment | None:
     stmt = (
         select(Segment)
         .where(Segment.id == segment_id)
-        .options(selectinload(Segment.offerings))
+        .options(selectinload(Segment.offerings), selectinload(Segment.created_by_user))
     )
 
     result = await db.execute(stmt)
@@ -101,7 +101,7 @@ async def list_segments(
     Returns:
         List of Segment instances with offerings loaded
     """
-    stmt = select(Segment).options(selectinload(Segment.offerings))
+    stmt = select(Segment).options(selectinload(Segment.offerings), selectinload(Segment.created_by_user))
 
     # Apply filters
     conditions = []
@@ -318,16 +318,18 @@ async def list_offerings(
     db: AsyncSession,
     skip: int = 0,
     limit: int = 50,
-    status_filter: OfferingStatusEnum | None = None
+    status_filter: OfferingStatusEnum | None = None,
+    search: str | None = None
 ) -> list[Offering]:
     """
-    List offerings with pagination and optional status filter.
+    List offerings with pagination, optional status filter, and search.
 
     Args:
         db: Database session
         skip: Number of records to skip (for pagination)
         limit: Maximum number of records to return
         status_filter: Optional status filter
+        search: Optional search string (case-insensitive name match)
 
     Returns:
         List of Offering instances
@@ -337,6 +339,10 @@ async def list_offerings(
     # Apply status filter
     if status_filter:
         stmt = stmt.where(Offering.status == status_filter)
+
+    # Apply search filter
+    if search:
+        stmt = stmt.where(Offering.name.ilike(f"%{search}%"))
 
     # Apply ordering and pagination
     stmt = stmt.order_by(Offering.created_at.desc()).offset(skip).limit(limit)

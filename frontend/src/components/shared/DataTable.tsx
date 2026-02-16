@@ -43,7 +43,7 @@ export function DataTable<T>({
 
   if (loading) {
     return (
-      <div className={cn('bg-white rounded-lg border border-slate-200 shadow-sm', className)}>
+      <div className={cn('bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm', className)}>
         <div className="p-12">
           <LoadingSpinner size="lg" />
         </div>
@@ -53,17 +53,17 @@ export function DataTable<T>({
 
   if (data.length === 0) {
     return (
-      <div className={cn('bg-white rounded-lg border border-slate-200 shadow-sm', className)}>
+      <div className={cn('bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm', className)}>
         <EmptyState icon={Database} title="No data found" description={emptyMessage} />
       </div>
     );
   }
 
   return (
-    <div className={cn('bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden', className)}>
+    <div className={cn('bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden', className)}>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200">
-          <thead className="bg-slate-50">
+        <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+          <thead className="bg-slate-50 dark:bg-slate-700">
             <tr>
               {columns.map((column) => (
                 <th
@@ -71,8 +71,8 @@ export function DataTable<T>({
                   scope="col"
                   style={{ width: column.width }}
                   className={cn(
-                    'px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider',
-                    column.sortable && 'cursor-pointer select-none hover:bg-slate-100 transition-colors duration-150'
+                    'px-6 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider',
+                    column.sortable && 'cursor-pointer select-none hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors duration-150'
                   )}
                   onClick={() => column.sortable && handleSort(column)}
                 >
@@ -92,21 +92,21 @@ export function DataTable<T>({
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-slate-200">
+          <tbody className="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
             {data.map((item, rowIndex) => (
               <tr
                 key={rowIndex}
                 onClick={() => onRowClick?.(item)}
                 className={cn(
                   'transition-colors duration-150',
-                  onRowClick && 'cursor-pointer hover:bg-slate-50',
-                  rowIndex % 2 === 1 && 'bg-slate-25'
+                  onRowClick && 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700',
+                  rowIndex % 2 === 1 && 'bg-slate-25 dark:bg-slate-800/50'
                 )}
               >
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className="px-6 py-4 whitespace-nowrap text-sm text-slate-900"
+                    className="px-6 py-4 whitespace-nowrap text-sm text-slate-900 dark:text-slate-100"
                   >
                     {column.render ? column.render(item) : ((item as any)[column.key] as React.ReactNode)}
                   </td>

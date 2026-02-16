@@ -58,7 +58,7 @@ class Company(BaseModel):
         index=True
     )
     status: Mapped[CompanyStatusEnum] = mapped_column(
-        SAEnum(CompanyStatusEnum, name="company_status", create_type=False),
+        SAEnum(CompanyStatusEnum, name="company_status", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=CompanyStatusEnum.PENDING,
         server_default="pending",
@@ -105,6 +105,13 @@ class Company(BaseModel):
             name="unique_company_per_segment"
         ),
     )
+
+    @property
+    def created_by_name(self) -> str | None:
+        """Return the name of the user who created this company."""
+        if self.created_by_user:
+            return self.created_by_user.name
+        return None
 
     def __repr__(self) -> str:
         return f"<Company(id={self.id}, name={self.company_name}, status={self.status})>"

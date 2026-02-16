@@ -22,7 +22,7 @@ export default function AppShell() {
   }, []);
 
   return (
-    <div className="h-screen flex overflow-hidden bg-slate-50">
+    <div className="h-screen flex overflow-hidden bg-slate-50 dark:bg-slate-900">
       {/* Sidebar */}
       <Sidebar />
 

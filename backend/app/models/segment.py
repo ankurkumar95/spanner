@@ -38,7 +38,7 @@ class Segment(Base, UUIDPKMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[SegmentStatusEnum] = mapped_column(
-        SAEnum(SegmentStatusEnum, name="segment_status", create_type=False),
+        SAEnum(SegmentStatusEnum, name="segment_status", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=SegmentStatusEnum.ACTIVE,
         server_default="active",
@@ -82,6 +82,13 @@ class Segment(Base, UUIDPKMixin, TimestampMixin):
         back_populates="segment"
     )
 
+    @property
+    def created_by_name(self) -> str | None:
+        """Return the name of the user who created this segment."""
+        if self.created_by_user:
+            return self.created_by_user.name
+        return None
+
     def __repr__(self) -> str:
         return f"<Segment(id={self.id}, name={self.name}, status={self.status})>"
 
@@ -94,7 +101,7 @@ class Offering(Base, UUIDPKMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(Text, unique=True, nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[OfferingStatusEnum] = mapped_column(
-        SAEnum(OfferingStatusEnum, name="offering_status", create_type=False),
+        SAEnum(OfferingStatusEnum, name="offering_status", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=OfferingStatusEnum.ACTIVE,
         server_default="active",

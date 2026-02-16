@@ -19,7 +19,7 @@ from app.services import company_service
 router = APIRouter()
 
 
-@router.get("/", response_model=dict)
+@router.get("/")
 async def list_companies(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(50, ge=1, le=100, description="Maximum number of records"),
@@ -54,7 +54,7 @@ async def list_companies(
     )
 
     return {
-        "items": companies,
+        "items": [CompanyResponse.model_validate(c) for c in companies],
         "total": total,
         "skip": skip,
         "limit": limit
@@ -144,6 +144,7 @@ async def get_company(
         "is_duplicate": company.is_duplicate,
         "batch_id": company.batch_id,
         "created_by": company.created_by,
+        "created_by_name": company.created_by_name,
         "created_at": company.created_at,
         "updated_at": company.updated_at,
         "contact_count": contact_count
@@ -253,7 +254,7 @@ async def mark_duplicate(
         )
 
 
-@router.get("/pending/list", response_model=dict)
+@router.get("/pending/list")
 async def list_pending_companies(
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(50, ge=1, le=100, description="Maximum number of records"),
@@ -275,7 +276,7 @@ async def list_pending_companies(
     total = await company_service.count_pending_companies(db=db)
 
     return {
-        "items": companies,
+        "items": [CompanyResponse.model_validate(c) for c in companies],
         "total": total,
         "skip": skip,
         "limit": limit

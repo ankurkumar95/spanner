@@ -90,21 +90,22 @@ export default function CommandSearch({ isOpen, onClose }: CommandSearchProps) {
     setIsSearching(true);
     try {
       const [segmentsRes, companiesRes, contactsRes] = await Promise.all([
-        api.get<PaginatedResponse<Segment>>('/segments', {
+        api.get<Segment[]>('/segments/', {
           params: { search: searchQuery, limit: 5 },
         }),
-        api.get<PaginatedResponse<Company>>('/companies', {
+        api.get<PaginatedResponse<Company>>('/companies/', {
           params: { search: searchQuery, limit: 5 },
         }),
-        api.get<PaginatedResponse<Contact>>('/contacts', {
-          params: { search: searchQuery, limit: 5 },
+        api.get<{ contacts: Contact[]; total: number }>('/contacts', {
+          params: { search: searchQuery, per_page: 5 },
         }),
       ]);
 
       const searchResults: SearchResult[] = [];
 
-      // Add segments
-      segmentsRes.data.items.forEach((segment) => {
+      // Add segments (API returns plain array)
+      const segments = Array.isArray(segmentsRes.data) ? segmentsRes.data : [];
+      segments.forEach((segment) => {
         searchResults.push({
           id: segment.id,
           type: 'segment',
@@ -114,7 +115,7 @@ export default function CommandSearch({ isOpen, onClose }: CommandSearchProps) {
         });
       });
 
-      // Add companies
+      // Add companies (API returns { items, total, ... })
       companiesRes.data.items.forEach((company) => {
         searchResults.push({
           id: company.id,
@@ -125,8 +126,8 @@ export default function CommandSearch({ isOpen, onClose }: CommandSearchProps) {
         });
       });
 
-      // Add contacts
-      contactsRes.data.items.forEach((contact) => {
+      // Add contacts (API returns { contacts, total, ... })
+      contactsRes.data.contacts.forEach((contact) => {
         searchResults.push({
           id: contact.id,
           type: 'contact',
@@ -214,19 +215,19 @@ export default function CommandSearch({ isOpen, onClose }: CommandSearchProps) {
 
       {/* Modal */}
       <div className="relative min-h-screen flex items-start justify-center p-4 pt-20">
-        <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200">
+        <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-2xl border border-slate-200 dark:border-slate-700">
           {/* Search Input */}
-          <div className="flex items-center gap-3 p-4 border-b border-slate-200">
-            <Search className="w-5 h-5 text-slate-400 flex-shrink-0" />
+          <div className="flex items-center gap-3 p-4 border-b border-slate-200 dark:border-slate-700">
+            <Search className="w-5 h-5 text-slate-400 dark:text-slate-500 flex-shrink-0" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search segments, companies, contacts, or pages..."
-              className="flex-1 outline-none text-slate-900 placeholder:text-slate-400"
+              className="flex-1 outline-none text-slate-900 dark:text-white bg-transparent placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
-            <kbd className="hidden sm:inline-flex items-center gap-1 rounded border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600">
+            <kbd className="hidden sm:inline-flex items-center gap-1 rounded border border-slate-200 dark:border-slate-600 px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-400">
               ESC
             </kbd>
           </div>
@@ -236,13 +237,13 @@ export default function CommandSearch({ isOpen, onClose }: CommandSearchProps) {
             {isSearching ? (
               <div className="py-12 text-center">
                 <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-primary-600 border-r-transparent"></div>
-                <p className="mt-2 text-sm text-slate-600">Searching...</p>
+                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Searching...</p>
               </div>
             ) : results.length > 0 ? (
               <div className="space-y-4">
                 {Object.entries(groupedResults).map(([type, items]) => (
                   <div key={type}>
-                    <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2 px-2">
+                    <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-2 px-2">
                       {type === 'page' ? 'Pages' : `${type}s`}
                     </h3>
                     <div className="space-y-1">
@@ -256,15 +257,15 @@ export default function CommandSearch({ isOpen, onClose }: CommandSearchProps) {
                             onMouseEnter={() => setSelectedIndex(globalIndex)}
                             className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
                               selectedIndex === globalIndex
-                                ? 'bg-primary-50 text-primary-900'
-                                : 'hover:bg-slate-50 text-slate-700'
+                                ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100'
+                                : 'hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
                             }`}
                           >
                             <div
                               className={`flex-shrink-0 w-8 h-8 rounded-md flex items-center justify-center ${
                                 selectedIndex === globalIndex
-                                  ? 'bg-primary-100 text-primary-600'
-                                  : 'bg-slate-100 text-slate-600'
+                                  ? 'bg-primary-100 dark:bg-primary-800 text-primary-600 dark:text-primary-300'
+                                  : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
                               }`}
                             >
                               <Icon className="w-4 h-4" />
@@ -272,7 +273,7 @@ export default function CommandSearch({ isOpen, onClose }: CommandSearchProps) {
                             <div className="flex-1 text-left min-w-0">
                               <p className="text-sm font-medium truncate">{result.title}</p>
                               {result.subtitle && (
-                                <p className="text-xs text-slate-500 truncate">{result.subtitle}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{result.subtitle}</p>
                               )}
                             </div>
                             <ArrowRight
@@ -289,28 +290,28 @@ export default function CommandSearch({ isOpen, onClose }: CommandSearchProps) {
               </div>
             ) : (
               <div className="py-12 text-center">
-                <Search className="w-8 h-8 text-slate-300 mx-auto mb-3" />
-                <p className="text-sm text-slate-600">No results found</p>
-                <p className="text-xs text-slate-400 mt-1">Try a different search term</p>
+                <Search className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+                <p className="text-sm text-slate-600 dark:text-slate-400">No results found</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Try a different search term</p>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 bg-slate-50 text-xs text-slate-500">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded border border-slate-300 bg-white">↑</kbd>
-                <kbd className="px-1.5 py-0.5 rounded border border-slate-300 bg-white">↓</kbd>
+                <kbd className="px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">↑</kbd>
+                <kbd className="px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">↓</kbd>
                 Navigate
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded border border-slate-300 bg-white">Enter</kbd>
+                <kbd className="px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">Enter</kbd>
                 Select
               </span>
             </div>
             <div className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded border border-slate-300 bg-white">Esc</kbd>
+              <kbd className="px-1.5 py-0.5 rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">Esc</kbd>
               Close
             </div>
           </div>

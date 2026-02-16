@@ -3,7 +3,6 @@ import { api } from '../lib/api';
 import {
   Segment,
   SegmentWithStats,
-  PaginatedResponse,
 } from '../types';
 import toast from 'react-hot-toast';
 
@@ -30,15 +29,23 @@ export function useSegments(params: SegmentsParams = {}) {
   return useQuery({
     queryKey: ['segments', params],
     queryFn: async () => {
-      const response = await api.get<PaginatedResponse<SegmentWithStats>>('/segments', {
+      // Segments API returns a plain array, not paginated
+      const response = await api.get<SegmentWithStats[]>('/segments/', {
         params: {
           skip: params.skip || 0,
-          limit: params.limit || 20,
+          limit: params.limit || 100,
           search: params.search || undefined,
           status: params.status && params.status !== 'all' ? params.status : undefined,
         },
       });
-      return response.data;
+      // Wrap plain array in PaginatedResponse-like shape for consistency
+      const items = response.data;
+      return {
+        items,
+        total: items.length,
+        skip: params.skip || 0,
+        limit: params.limit || 100,
+      };
     },
   });
 }
@@ -59,7 +66,7 @@ export function useCreateSegment() {
 
   return useMutation({
     mutationFn: async (data: CreateSegmentData) => {
-      const response = await api.post<Segment>('/segments', data);
+      const response = await api.post<Segment>('/segments/', data);
       return response.data;
     },
     onSuccess: () => {

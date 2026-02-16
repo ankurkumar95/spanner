@@ -50,7 +50,7 @@ class User(Base, UUIDPKMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(Text, nullable=False)
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
     status: Mapped[UserStatusEnum] = mapped_column(
-        SAEnum(UserStatusEnum, name="user_status", create_type=False),
+        SAEnum(UserStatusEnum, name="user_status", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         default=UserStatusEnum.ACTIVE,
         server_default="active",
@@ -145,7 +145,7 @@ class UserRole(Base, TimestampMixin):
         index=True
     )
     role: Mapped[UserRoleEnum] = mapped_column(
-        SAEnum(UserRoleEnum, name="user_role", create_type=False),
+        SAEnum(UserRoleEnum, name="user_role", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         index=True
     )
@@ -172,7 +172,7 @@ class RoleGrant(Base, TimestampMixin):
         primary_key=True
     )
     role: Mapped[UserRoleEnum] = mapped_column(
-        SAEnum(UserRoleEnum, name="user_role", create_type=False),
+        SAEnum(UserRoleEnum, name="user_role", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
         index=True
     )

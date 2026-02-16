@@ -38,7 +38,7 @@ class Notification(Base, UUIDPKMixin):
         index=True
     )
     type: Mapped[NotificationTypeEnum] = mapped_column(
-        SAEnum(NotificationTypeEnum, name="notification_type", create_type=False),
+        SAEnum(NotificationTypeEnum, name="notification_type", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False
     )
     title: Mapped[str] = mapped_column(Text, nullable=False)
