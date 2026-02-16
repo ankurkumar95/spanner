@@ -1,0 +1,7 @@
+export { Home } from './Home'
+export { NotFound } from './NotFound'
+export { default as Approvals } from './Approvals'
+export { default as UserManagement } from './UserManagement'
+export { default as Companies } from './Companies'
+export { default as Contacts } from './Contacts'
+export { default as Segments } from './Segments'

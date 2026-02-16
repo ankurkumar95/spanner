@@ -1,0 +1,221 @@
+erDiagram
+    %% Spanner CRM - Entity Relationship Diagram
+    %% Core entities and their relationships
+
+    users ||--o{ user_roles : "has many"
+    users ||--o{ segments : "creates"
+    users ||--o{ companies : "creates"
+    users ||--o{ contacts : "creates"
+    users ||--o{ assignments : "assigned to"
+    users ||--o{ assignments : "assigned by"
+    users ||--o{ upload_batches : "uploads"
+    users ||--o{ audit_logs : "performs action"
+    users ||--o| user_preferences : "has one"
+    users ||--o{ notifications : "receives"
+    users ||--o{ notifications : "triggers (actor)"
+    users ||--o{ marketing_collateral : "creates"
+    users ||--o{ contacts : "assigned as SDR"
+
+    user_roles }o--|| role_grants : "has permissions"
+
+    segments ||--o{ companies : "contains"
+    segments ||--o{ contacts : "derived from company"
+    segments ||--o{ segment_offerings : "has many"
+    segments ||--o{ marketing_collateral : "scoped to"
+
+    offerings ||--o{ segment_offerings : "belongs to"
+    offerings ||--o{ marketing_collateral : "scoped to"
+
+    companies ||--o{ contacts : "has many"
+    companies ||--o{ assignments : "can be assigned"
+
+    contacts ||--o{ assignments : "can be assigned"
+    contacts ||--o{ marketing_collateral : "lead collateral"
+
+    assignments }o--|| users : "assigned to user"
+    assignments }o--|| users : "assigned by user"
+
+    upload_batches ||--o{ companies : "batch import"
+    upload_batches ||--o{ contacts : "batch import"
+
+    %% Entity Definitions
+
+    users {
+        UUID id PK
+        TEXT email UK "unique, required"
+        TEXT name "required"
+        TEXT password_hash "bcrypt"
+        user_status status "active/deactivated"
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    user_roles {
+        BIGINT id PK
+        UUID user_id FK "references users"
+        user_role role "enum: admin, segment_owner, researcher, approver, sdr, marketing"
+        TIMESTAMPTZ created_at
+    }
+
+    role_grants {
+        BIGINT id PK
+        user_role role "enum"
+        TEXT action "permission name"
+        BOOLEAN granted "default true"
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    segments {
+        UUID id PK
+        TEXT name UK "unique, required"
+        TEXT description "nullable"
+        segment_status status "active/archived"
+        UUID created_by FK "references users"
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    offerings {
+        UUID id PK
+        TEXT name UK "unique, required"
+        TEXT description "nullable"
+        offering_status status "active/inactive"
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    segment_offerings {
+        UUID segment_id PK,FK "references segments"
+        UUID offering_id PK,FK "references offerings"
+        TIMESTAMPTZ created_at
+    }
+
+    companies {
+        UUID id PK
+        TEXT company_name "required, max 500"
+        TEXT company_website "nullable, validated"
+        TEXT company_phone "nullable, max 50"
+        TEXT company_description "nullable, max 5000"
+        TEXT company_linkedin_url "nullable, validated"
+        TEXT company_industry "nullable, max 200"
+        TEXT company_sub_industry "nullable, max 200"
+        TEXT street "nullable, max 500"
+        TEXT city "nullable, max 200"
+        TEXT state_province "nullable, max 200"
+        TEXT country_region "nullable, max 200"
+        TEXT zip_postal_code "nullable, max 50"
+        INTEGER founded_year "1800-current year"
+        TEXT revenue_range "nullable, max 200"
+        TEXT employee_size_range "nullable, max 200"
+        UUID segment_id FK "references segments, required"
+        company_status status "pending/approved/rejected"
+        TEXT rejection_reason "required if rejected"
+        BOOLEAN is_duplicate "default false"
+        UUID batch_id "nullable, for CSV uploads"
+        UUID created_by FK "references users"
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    contacts {
+        UUID id PK
+        TEXT first_name "required, max 200"
+        TEXT last_name "required, max 200"
+        TEXT email "required, validated"
+        TEXT mobile_phone "nullable, max 50"
+        TEXT job_title "nullable, max 500"
+        TEXT direct_phone_number "nullable, max 50"
+        TEXT email_address_2 "nullable, validated"
+        TEXT email_active_status "nullable, max 100"
+        TEXT lead_source_global "nullable, max 200"
+        TEXT management_level "nullable, max 200"
+        TEXT street "nullable, max 500"
+        TEXT city "nullable, max 200"
+        TEXT state_province "nullable, max 200"
+        TEXT country_region "nullable, max 200"
+        TEXT zip_postal_code "nullable, max 50"
+        TEXT primary_time_zone "nullable, max 100"
+        TEXT contact_linkedin_url "nullable, validated"
+        TEXT linkedin_summary "nullable, max 5000"
+        TEXT data_requester_details "nullable, max 500"
+        UUID company_id FK "references companies, required"
+        UUID segment_id FK "references segments, derived"
+        contact_status status "uploaded/approved/assigned_to_sdr/meeting_scheduled"
+        UUID assigned_sdr_id FK "references users, nullable"
+        BOOLEAN is_duplicate "default false"
+        UUID batch_id "nullable, for CSV uploads"
+        UUID created_by FK "references users"
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    assignments {
+        UUID id PK
+        entity_type entity_type "enum: segment/company/contact"
+        UUID entity_id "polymorphic FK"
+        UUID assigned_to FK "references users"
+        UUID assigned_by FK "references users"
+        TIMESTAMPTZ created_at
+    }
+
+    upload_batches {
+        UUID id PK
+        upload_type upload_type "enum: company/contact"
+        TEXT file_name "required"
+        INTEGER file_size_bytes "required, > 0"
+        INTEGER total_rows "default 0"
+        INTEGER valid_rows "default 0"
+        INTEGER invalid_rows "default 0"
+        batch_status status "processing/completed/failed"
+        TEXT error_report_url "nullable, path to CSV"
+        UUID uploaded_by FK "references users"
+        TIMESTAMPTZ created_at
+    }
+
+    audit_logs {
+        UUID id PK
+        UUID actor_id FK "references users, nullable"
+        TEXT action "required, e.g. create/update/approve/reject"
+        TEXT entity_type "required"
+        UUID entity_id "required"
+        JSONB details "old/new values, metadata"
+        TIMESTAMPTZ created_at
+    }
+
+    user_preferences {
+        UUID id PK
+        UUID user_id UK,FK "references users, unique"
+        TEXT sidebar_theme "light/dark/auto"
+        JSONB notification_preferences "default {email: true, in_app: true}"
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    notifications {
+        UUID id PK
+        UUID user_id FK "references users, required"
+        notification_type type "enum: assignment/approval_required/status_change/upload_completed/system"
+        TEXT title "required, max 255"
+        TEXT message "required, max 1000"
+        TEXT link "nullable, URL to entity"
+        BOOLEAN is_read "default false"
+        UUID actor_id FK "references users, nullable"
+        TEXT entity_type "nullable"
+        UUID entity_id "nullable"
+        TIMESTAMPTZ created_at
+    }
+
+    marketing_collateral {
+        UUID id PK
+        TEXT title "required, max 255"
+        TEXT url "required, max 2048"
+        TEXT description "nullable, max 1000"
+        TEXT scope_type "segment/offering/lead"
+        UUID scope_id "polymorphic FK"
+        UUID segment_id FK "references segments, nullable"
+        UUID offering_id FK "references offerings, nullable"
+        UUID created_by FK "references users"
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }

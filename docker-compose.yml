@@ -1,0 +1,68 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: spanner-postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: spanner
+      POSTGRES_USER: spanner
+      POSTGRES_PASSWORD: spanner_dev_pwd
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spanner"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - spanner-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: spanner-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      DATABASE_URL: postgresql+asyncpg://spanner:spanner_dev_pwd@postgres:5432/spanner
+      SECRET_KEY: dev-secret-key-change-in-production-f8a3b2c1d4e5f6g7h8i9j0k1l2m3n4o5
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      REFRESH_TOKEN_EXPIRE_DAYS: 7
+      CORS_ORIGINS: http://localhost:5173,http://localhost:3000
+      API_V1_PREFIX: /api/v1
+      ENVIRONMENT: development
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - spanner-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: spanner-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0
+    depends_on:
+      - backend
+    networks:
+      - spanner-network
+
+volumes:
+  postgres_data:
+
+networks:
+  spanner-network:
+    driver: bridge
