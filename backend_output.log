@@ -1,0 +1,17 @@
+INFO:     Started server process [38866]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:40790 - "POST /api/auth/login HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:58082 - "POST /api/auth/login HTTP/1.1" 422 Unprocessable Entity
+2026-02-15 18:49:01,078 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-02-15 18:49:01,083 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.name, users.password_hash, users.is_active, users.created_at, users.updated_at
+FROM users
+WHERE users.email = ?
+2026-02-15 18:49:01,083 INFO sqlalchemy.engine.Engine [generated in 0.00030s] ('admin@spanner.app',)
+2026-02-15 18:49:01,091 INFO sqlalchemy.engine.Engine SELECT users_1.id AS users_1_id, roles.id AS roles_id, roles.name AS roles_name, roles.description AS roles_description
+FROM users AS users_1 JOIN user_roles AS user_roles_1 ON users_1.id = user_roles_1.user_id JOIN roles ON roles.id = user_roles_1.role_id
+WHERE users_1.id IN (?)
+2026-02-15 18:49:01,091 INFO sqlalchemy.engine.Engine [generated in 0.00041s] ('720455e8-f919-45ea-b9d8-a4ceb6a36abb',)
+INFO:     127.0.0.1:59548 - "POST /api/auth/login HTTP/1.1" 200 OK
+2026-02-15 18:49:01,433 INFO sqlalchemy.engine.Engine ROLLBACK
