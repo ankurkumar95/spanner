@@ -1,7 +1,7 @@
 # Jules Agent F — Frontend Shell + Integration
 
-> **Run this LAST**, after Agents A–E are all merged to main.
-> **Branch name:** `feature/integration`
+> **Run this LAST**, after Agents A–E are all merged to main.  
+> **Branch name:** `feature/integration`  
 > **Base branch:** `main` (with Agents 0, A, B, C, D, E all merged)
 
 ---

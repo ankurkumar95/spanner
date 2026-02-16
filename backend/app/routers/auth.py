@@ -4,7 +4,9 @@ from ..database import get_db
 from ..schemas.auth import LoginRequest, TokenResponse, RefreshRequest, UserResponse, ForgotPasswordRequest, ResetPasswordRequest
 from ..services.auth_service import authenticate_user, create_tokens
 from jose import JWTError
-from ..utils.security import decode_token
+from ..utils.security import decode_token, create_token
+from ..config import settings
+from datetime import timedelta
 
 router = APIRouter()
 
@@ -40,9 +42,6 @@ async def refresh(data: RefreshRequest):
 
         # In a real app, you'd check if user exists and is active
         # For now, just generate a new access token
-        from datetime import timedelta
-        from ..config import settings
-        from ..utils.security import create_token
 
         # We don't have roles here unless we fetch user.
         # Simple implementation for Agent 0:

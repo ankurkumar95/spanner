@@ -18,8 +18,8 @@ const Layout: React.FC = () => {
   }, []);
 
   const navItems = [
-    { label: 'Dashboard', icon: 'dashboard', path: '/dashboard', section: 'Main' },
-    { label: 'User Management', icon: 'manage_accounts', path: '/user-management', section: 'Main' },
+    { label: 'Dashboard', icon: 'dashboard', path: '/', section: 'Main' },
+    { label: 'User Management', icon: 'manage_accounts', path: '/users', section: 'Main' },
     { label: 'Segments', icon: 'pie_chart', path: '/segments', section: 'Workspace' },
     { label: 'Companies', icon: 'domain', path: '/companies', section: 'Workspace' },
     { label: 'Contacts', icon: 'group', path: '/contacts', section: 'Workspace' },

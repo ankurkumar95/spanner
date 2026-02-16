@@ -1,7 +1,7 @@
 # Jules Agent A — Segments + Assignments + Offerings
 
-> **Run in PARALLEL** with Agents B, C, D, E (after Agent 0 is merged to main).
-> **Branch name:** `feature/segments-assignments`
+> **Run in PARALLEL** with Agents B, C, D, E (after Agent 0 is merged to main).  
+> **Branch name:** `feature/segments-assignments`  
 > **Base branch:** `main` (with Agent 0 merged)
 
 ---

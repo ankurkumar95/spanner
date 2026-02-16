@@ -1,6 +1,6 @@
 # Jules Agent 0 — Foundation
 
-> **Run this FIRST, alone.** All other agents depend on this branch being merged to main.
+> **Run this FIRST, alone.** All other agents depend on this branch being merged to main.  
 > **Branch name:** `foundation`
 
 ---

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Spanner - Approval Queue</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style type="text/tailwindcss">
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --surface: #ffffff;
+            --background: #f3f4f6;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+        }
+        .sidebar-link {
+            @apply flex items-center px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors;
+        }
+        .sidebar-link.active {
+            @apply bg-blue-50 text-blue-700;
+        }
+        .btn-primary {
+            @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors;
+        }
+        .btn-secondary {
+            @apply inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors;
+        }
+        .badge {
+            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+        }
+        .badge-pending {
+            @apply bg-amber-100 text-amber-800;
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+<div class="hidden md:flex md:w-64 md:flex-col fixed inset-y-0 z-10 border-r border-gray-200 bg-white">
+<div class="flex items-center h-16 flex-shrink-0 px-6 border-b border-gray-100">
+<span class="material-symbols-outlined text-blue-600 mr-2 text-3xl">build_circle</span>
+<span class="text-xl font-bold tracking-tight text-gray-900">Spanner</span>
+</div>
+<div class="flex-grow flex flex-col overflow-y-auto pt-5 pb-4">
+<nav class="flex-1 px-4 space-y-1">
+<a class="sidebar-link" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">dashboard</span>
+                    Dashboard
+                </a>
+<a class="sidebar-link" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">science</span>
+                    Researcher Workbench
+                </a>
+<a class="sidebar-link" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">pie_chart</span>
+                    Segments
+                </a>
+<a class="sidebar-link" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">domain</span>
+                    Companies
+                </a>
+<a class="sidebar-link" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">group</span>
+                    Contacts
+                </a>
+<a class="sidebar-link active" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px] filled">checklist</span>
+                    Approval Queue
+                </a>
+<a class="sidebar-link" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]">upload_file</span>
+                    CSV Upload
+                </a>
+</nav>
+</div>
+<div class="border-t border-gray-200 p-4">
+<div class="flex items-center w-full">
+<div class="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm">
+                    BA
+                </div>
+<div class="ml-3">
+<p class="text-sm font-medium text-gray-700">Bob Approver</p>
+<p class="text-xs font-medium text-gray-500">Approver Role</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1 flex flex-col md:pl-64 h-full bg-gray-50">
+<header class="h-16 flex items-center justify-between px-8 bg-white border-b border-gray-200 sticky top-0 z-20">
+<div class="flex items-center">
+<h1 class="text-2xl font-semibold text-gray-900">Approval Queue</h1>
+</div>
+<div class="flex items-center space-x-4">
+<button class="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+</button>
+<div class="h-6 w-px bg-gray-200"></div>
+<button class="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900">
+<span class="mr-2">Logout</span>
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-8">
+<div class="border-b border-gray-200 mb-6">
+<nav aria-label="Tabs" class="-mb-px flex space-x-8">
+<a class="border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center" href="#">
+                        Pending Companies
+                        <span class="bg-blue-100 text-blue-600 hidden ml-3 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block">12</span>
+</a>
+<a class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center" href="#">
+                        Uploaded Contacts
+                        <span class="bg-gray-100 text-gray-900 hidden ml-3 py-0.5 px-2.5 rounded-full text-xs font-medium md:inline-block">45</span>
+</a>
+</nav>
+</div>
+<div class="bg-white rounded-lg border border-gray-200 p-4 mb-6 shadow-sm flex flex-wrap gap-4 items-center justify-between">
+<div class="flex flex-wrap items-center gap-3 flex-1">
+<div class="relative rounded-md shadow-sm max-w-xs w-full">
+<div class="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
+<span class="material-symbols-outlined text-gray-400 text-[20px]">search</span>
+</div>
+<input class="focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md" id="search" name="search" placeholder="Search companies..." type="text"/>
+</div>
+<div class="h-8 w-px bg-gray-200 mx-1"></div>
+<div class="relative">
+<select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+<option>All Segments</option>
+<option>Enterprise Fintech APAC</option>
+<option>Mid-Market Healthcare US</option>
+<option>Startup SaaS Europe</option>
+</select>
+</div>
+<div class="relative">
+<select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+<option>All Researchers</option>
+<option>Jane Researcher</option>
+<option>Tom Scout</option>
+</select>
+</div>
+<div class="relative">
+<button class="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm" type="button">
+<span class="block truncate text-gray-500">Date Range</span>
+<span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+<span class="material-symbols-outlined text-gray-400 text-[20px]">calendar_today</span>
+</span>
+</button>
+</div>
+</div>
+<div class="flex items-center space-x-2">
+<span class="text-sm text-gray-500 mr-2">Showing 1-10 of 12</span>
+<button class="p-2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-400 disabled:opacity-50">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="p-2 border border-gray-300 rounded-md hover:bg-gray-50 text-gray-600">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Company Name</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Segment</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Status</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Researcher</th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" scope="col">Upload Date</th>
+<th class="relative px-6 py-3" scope="col">
+<span class="sr-only">Actions</span>
+</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200">
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 rounded bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                        N
+                                    </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">NovaPay Financial</div>
+<div class="text-sm text-gray-500">novapay.io</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Enterprise Fintech APAC</div>
+<div class="text-xs text-gray-500 mt-0.5">High Priority</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="badge badge-pending">
+                                    Pending Approval
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Jane Researcher
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Oct 12, 2023
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex items-center justify-end space-x-2">
+<button class="bg-green-50 text-green-700 hover:bg-green-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">check</span>
+                                        Approve
+                                    </button>
+<button class="bg-red-50 text-red-700 hover:bg-red-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">close</span>
+                                        Reject
+                                    </button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 rounded bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                        G
+                                    </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">GlobalTech Solutions</div>
+<div class="text-sm text-gray-500">globaltech.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Startup SaaS Europe</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="badge badge-pending">
+                                    Pending Approval
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Jane Researcher
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Oct 11, 2023
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex items-center justify-end space-x-2">
+<button class="bg-green-50 text-green-700 hover:bg-green-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">check</span>
+                                        Approve
+                                    </button>
+<button class="bg-red-50 text-red-700 hover:bg-red-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">close</span>
+                                        Reject
+                                    </button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 rounded bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                        A
+                                    </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">Acme Corp</div>
+<div class="text-sm text-gray-500">acmecorp.net</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Mid-Market Healthcare US</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="badge badge-pending">
+                                    Pending Approval
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Tom Scout
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Oct 10, 2023
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex items-center justify-end space-x-2">
+<button class="bg-green-50 text-green-700 hover:bg-green-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">check</span>
+                                        Approve
+                                    </button>
+<button class="bg-red-50 text-red-700 hover:bg-red-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">close</span>
+                                        Reject
+                                    </button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 rounded bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                        M
+                                    </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">MediCare Systems</div>
+<div class="text-sm text-gray-500">medicaresys.com</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Mid-Market Healthcare US</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="badge badge-pending">
+                                    Pending Approval
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Jane Researcher
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Oct 09, 2023
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex items-center justify-end space-x-2">
+<button class="bg-green-50 text-green-700 hover:bg-green-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">check</span>
+                                        Approve
+                                    </button>
+<button class="bg-red-50 text-red-700 hover:bg-red-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">close</span>
+                                        Reject
+                                    </button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="flex-shrink-0 h-10 w-10 rounded bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg">
+                                        C
+                                    </div>
+<div class="ml-4">
+<div class="text-sm font-medium text-gray-900">CloudFirst Inc</div>
+<div class="text-sm text-gray-500">cloudfirst.io</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-gray-900">Startup SaaS Europe</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="badge badge-pending">
+                                    Pending Approval
+                                </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Tom Scout
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                Oct 08, 2023
+                            </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<div class="flex items-center justify-end space-x-2">
+<button class="bg-green-50 text-green-700 hover:bg-green-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">check</span>
+                                        Approve
+                                    </button>
+<button class="bg-red-50 text-red-700 hover:bg-red-100 border border-transparent rounded-md px-3 py-1.5 text-xs font-medium transition-colors flex items-center">
+<span class="material-symbols-outlined text-[16px] mr-1">close</span>
+                                        Reject
+                                    </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+<p class="text-xs text-gray-500 text-center">End of pending list. Nice work!</p>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

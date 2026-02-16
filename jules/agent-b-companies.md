@@ -1,7 +1,7 @@
 # Jules Agent B — Companies + Company Approval
 
-> **Run in PARALLEL** with Agents A, C, D, E (after Agent 0 is merged to main).
-> **Branch name:** `feature/companies`
+> **Run in PARALLEL** with Agents A, C, D, E (after Agent 0 is merged to main).  
+> **Branch name:** `feature/companies`  
 > **Base branch:** `main` (with Agent 0 merged)
 
 ---

@@ -156,5 +156,5 @@ See `designs/INDEX.md` for the complete screen inventory.
 | Agent E | Medium | 20-30 min |
 | Agent F | Medium | 15-25 min |
 
-**Total serial time:** ~2.5-3.5 hours
+**Total serial time:** ~2.5-3.5 hours  
 **Total with parallelism:** ~1-1.5 hours (Agent 0 + max(A-E) + Agent F)

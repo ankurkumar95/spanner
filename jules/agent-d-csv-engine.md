@@ -1,7 +1,7 @@
 # Jules Agent D — CSV Engine + Uploads + Dedup
 
-> **Run in PARALLEL** with Agents A, B, C, E (after Agent 0 is merged to main).
-> **Branch name:** `feature/csv-engine`
+> **Run in PARALLEL** with Agents A, B, C, E (after Agent 0 is merged to main).  
+> **Branch name:** `feature/csv-engine`  
 > **Base branch:** `main` (with Agent 0 merged)
 
 ---

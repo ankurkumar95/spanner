@@ -1,7 +1,7 @@
 # Jules Agent C — Contacts + Contact Approval
 
-> **Run in PARALLEL** with Agents A, B, D, E (after Agent 0 is merged to main).
-> **Branch name:** `feature/contacts`
+> **Run in PARALLEL** with Agents A, B, D, E (after Agent 0 is merged to main).  
+> **Branch name:** `feature/contacts`  
 > **Base branch:** `main` (with Agent 0 merged)
 
 ---

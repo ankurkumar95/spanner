@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CSV Data Mapping &amp; Validation - Spanner CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom scrollbar for table */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+            background-color: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-100 h-screen flex flex-col overflow-hidden">
+<!-- Top Navigation / Header -->
+<header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex-none z-20">
+<div class="px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-icons text-primary">table_chart</span>
+</div>
+<div>
+<h1 class="text-lg font-semibold leading-tight">Import Contacts</h1>
+<p class="text-xs text-slate-500 dark:text-slate-400">Target List: Q3 ABM Prospects</p>
+</div>
+</div>
+<!-- Stepper -->
+<div class="hidden md:flex items-center space-x-2">
+<div class="flex items-center text-primary">
+<span class="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold mr-2">✓</span>
+<span class="text-sm font-medium">Upload</span>
+</div>
+<div class="w-12 h-px bg-primary/30"></div>
+<div class="flex items-center text-primary">
+<span class="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold mr-2">2</span>
+<span class="text-sm font-medium">Mapping &amp; Validation</span>
+</div>
+<div class="w-12 h-px bg-slate-200 dark:bg-slate-700"></div>
+<div class="flex items-center text-slate-400 dark:text-slate-600">
+<span class="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-600 text-xs flex items-center justify-center font-bold mr-2">3</span>
+<span class="text-sm font-medium">Import</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm font-medium">Exit</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-h-0 relative">
+<!-- Toolbar & Stats -->
+<div class="flex-none bg-white dark:bg-slate-900/50 px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-4">
+<div>
+<h2 class="text-xl font-bold text-slate-900 dark:text-white">Map &amp; Validate Data</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Review column mappings and fix errors before importing.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 px-4 py-2 rounded-lg flex items-center gap-3">
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">Validation Status</span>
+<span class="text-sm font-medium text-red-800 dark:text-red-300">12 Errors detected in 5 rows</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer ml-2">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-slate-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-red-300 dark:peer-focus:ring-red-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-slate-600 peer-checked:bg-red-500"></div>
+<span class="ml-2 text-sm font-medium text-slate-600 dark:text-slate-300">Show errors only</span>
+</label>
+</div>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+<div class="text-right">
+<p class="text-xs text-slate-500 dark:text-slate-400">Total Records</p>
+<p class="text-lg font-bold text-slate-800 dark:text-white">1,240</p>
+</div>
+</div>
+</div>
+<!-- Data Grid Container -->
+<div class="flex-1 overflow-auto custom-scrollbar bg-slate-50 dark:bg-slate-950/50 p-6">
+<div class="bg-white dark:bg-slate-900 shadow-sm border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden min-w-[1000px]">
+<!-- Table Header (Sticky Mapping) -->
+<div class="sticky top-0 z-10 grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr] bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
+<!-- Status Column Header -->
+<div class="p-4 flex items-center justify-center border-r border-slate-200 dark:border-slate-700">
+<span class="material-icons text-slate-400 text-sm">flag</span>
+</div>
+<!-- Column 1 Mapping -->
+<div class="p-4 border-r border-slate-200 dark:border-slate-700 group">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">CSV: Company</span>
+<span class="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-[10px] px-1.5 py-0.5 rounded font-medium">Auto-matched</span>
+</div>
+<div class="relative">
+<select class="w-full bg-white dark:bg-slate-900 border border-primary/50 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 font-medium shadow-sm">
+<option selected="">Company Name</option>
+<option>Company Domain</option>
+<option>Industry</option>
+<option>Don't Import</option>
+</select>
+</div>
+</div>
+<!-- Column 2 Mapping -->
+<div class="p-4 border-r border-slate-200 dark:border-slate-700">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">CSV: Contact_Name</span>
+<span class="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-[10px] px-1.5 py-0.5 rounded font-medium">Auto-matched</span>
+</div>
+<div class="relative">
+<select class="w-full bg-white dark:bg-slate-900 border border-primary/50 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 font-medium shadow-sm">
+<option selected="">Full Name</option>
+<option>First Name</option>
+<option>Last Name</option>
+<option>Don't Import</option>
+</select>
+</div>
+</div>
+<!-- Column 3 Mapping (Error Source) -->
+<div class="p-4 border-r border-slate-200 dark:border-slate-700 bg-red-50/30 dark:bg-red-900/5">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">CSV: Email_Address</span>
+<span class="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-[10px] px-1.5 py-0.5 rounded font-medium">Auto-matched</span>
+</div>
+<div class="relative">
+<select class="w-full bg-white dark:bg-slate-900 border border-primary/50 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 font-medium shadow-sm">
+<option selected="">Email Address</option>
+<option>Work Email</option>
+<option>Personal Email</option>
+<option>Don't Import</option>
+</select>
+</div>
+</div>
+<!-- Column 4 Mapping -->
+<div class="p-4 border-r border-slate-200 dark:border-slate-700">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">CSV: Phone</span>
+<span class="bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400 text-[10px] px-1.5 py-0.5 rounded font-medium">Manual</span>
+</div>
+<div class="relative">
+<select class="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 font-medium shadow-sm">
+<option selected="">Work Phone</option>
+<option>Mobile Phone</option>
+<option>Company Phone</option>
+<option>Don't Import</option>
+</select>
+</div>
+</div>
+<!-- Column 5 Mapping -->
+<div class="p-4 border-r border-slate-200 dark:border-slate-700">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">CSV: Role</span>
+<span class="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-[10px] px-1.5 py-0.5 rounded font-medium">Auto-matched</span>
+</div>
+<div class="relative">
+<select class="w-full bg-white dark:bg-slate-900 border border-primary/50 text-slate-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5 font-medium shadow-sm">
+<option selected="">Job Title</option>
+<option>Seniority</option>
+<option>Department</option>
+<option>Don't Import</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Table Body -->
+<div class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+<!-- Valid Row 1 -->
+<div class="grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr] hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="p-3 flex items-center justify-center border-r border-slate-100 dark:border-slate-800">
+<span class="material-icons text-green-500 text-lg">check_circle</span>
+</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Acme Corp</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Sarah Jenkins</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">sarah.j@acme.com</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">+1 555-0102</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">VP of Sales</div>
+</div>
+<!-- Error Row 1 -->
+<div class="grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr] bg-red-50/50 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+<div class="p-3 flex items-center justify-center border-r border-slate-100 dark:border-slate-800">
+<span class="material-icons text-red-500 text-lg animate-pulse">error</span>
+</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Globex Inc.</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Mike Ross</div>
+<!-- Error Cell -->
+<div class="p-2 border-r border-slate-100 dark:border-slate-800 relative group">
+<input class="w-full px-2 py-1 bg-white dark:bg-slate-800 border border-red-300 dark:border-red-700 rounded text-red-600 dark:text-red-400 focus:outline-none focus:ring-2 focus:ring-red-500/50" type="text" value="mike.ross@"/>
+<div class="absolute -top-8 left-0 z-20 hidden group-hover:block bg-slate-900 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
+                                Invalid email format
+                                <div class="absolute -bottom-1 left-4 w-2 h-2 bg-slate-900 transform rotate-45"></div>
+</div>
+<span class="absolute right-3 top-3.5 material-icons text-red-500 text-sm cursor-help">info</span>
+</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">+1 555-0123</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Associate</div>
+</div>
+<!-- Valid Row 2 -->
+<div class="grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr] hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="p-3 flex items-center justify-center border-r border-slate-100 dark:border-slate-800">
+<span class="material-icons text-green-500 text-lg">check_circle</span>
+</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Stark Ind</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Tony S.</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">tony@stark.com</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300"></div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">CEO</div>
+</div>
+<!-- Error Row 2 -->
+<div class="grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr] bg-red-50/50 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+<div class="p-3 flex items-center justify-center border-r border-slate-100 dark:border-slate-800">
+<span class="material-icons text-red-500 text-lg animate-pulse">error</span>
+</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Wayne Ent</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Bruce Wayne</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">bruce@wayne.com</div>
+<!-- Error Cell -->
+<div class="p-2 border-r border-slate-100 dark:border-slate-800 relative group">
+<input class="w-full px-2 py-1 bg-white dark:bg-slate-800 border border-red-300 dark:border-red-700 rounded text-red-600 dark:text-red-400 focus:outline-none focus:ring-2 focus:ring-red-500/50" type="text" value="INVALID_NUM"/>
+<div class="absolute -top-8 left-0 z-20 hidden group-hover:block bg-slate-900 text-white text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap">
+                                Must be numeric
+                                <div class="absolute -bottom-1 left-4 w-2 h-2 bg-slate-900 transform rotate-45"></div>
+</div>
+<span class="absolute right-3 top-3.5 material-icons text-red-500 text-sm cursor-help">info</span>
+</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Chairman</div>
+</div>
+<!-- Valid Row 3 -->
+<div class="grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr] hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="p-3 flex items-center justify-center border-r border-slate-100 dark:border-slate-800">
+<span class="material-icons text-green-500 text-lg">check_circle</span>
+</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Cyberdyne</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Miles Dyson</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">miles.d@cyber.net</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">+1 555-9000</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Lead Scientist</div>
+</div>
+<!-- Valid Row 4 -->
+<div class="grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr] hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="p-3 flex items-center justify-center border-r border-slate-100 dark:border-slate-800">
+<span class="material-icons text-green-500 text-lg">check_circle</span>
+</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Massive Dynamic</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">William Bell</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">bell@massive.dynamic</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">+1 555-0000</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Founder</div>
+</div>
+<!-- Valid Row 5 -->
+<div class="grid grid-cols-[60px_1fr_1fr_1fr_1fr_1fr] hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<div class="p-3 flex items-center justify-center border-r border-slate-100 dark:border-slate-800">
+<span class="material-icons text-green-500 text-lg">check_circle</span>
+</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Umbrella Corp</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Albert Wesker</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">a.wesker@umbrella.com</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">+1 555-6666</div>
+<div class="p-3 border-r border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300">Researcher</div>
+</div>
+</div>
+<!-- Pagination/Load More Mock -->
+<div class="bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 p-3 text-center">
+<button class="text-sm text-primary font-medium hover:text-blue-700">Load more records...</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Actions -->
+<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-8 py-4 flex-none z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+<div class="flex items-center justify-between max-w-full mx-auto">
+<button class="text-slate-600 dark:text-slate-400 font-medium px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                Cancel Import
+            </button>
+<div class="flex items-center gap-4">
+<button class="px-6 py-2.5 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    Back
+                </button>
+<div class="relative group">
+<button class="px-6 py-2.5 bg-primary hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2">
+                        Import Data
+                        <span class="material-icons text-sm">arrow_forward</span>
+</button>
+<!-- Tooltip for when errors exist, implying user might want to check them first -->
+<div class="absolute bottom-full right-0 mb-2 w-64 p-2 bg-slate-800 text-white text-xs rounded hidden">
+                        You have unresolved errors. Invalid rows will be skipped.
+                    </div>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

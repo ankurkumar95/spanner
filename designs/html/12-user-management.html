@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Management - Spanner CRM</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary: #3b82f6;--primary-hover: #2563eb;--bg-body: #f9fafb;--text-main: #111827;--text-secondary: #6b7280;--border-color: #e5e7eb;--sidebar-width: 260px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+        }
+        .sidebar-link {
+            @apply flex items-center px-4 py-2.5 text-sm font-medium rounded-md transition-colors duration-150;
+        }
+        .sidebar-link:hover {
+            @apply bg-gray-100 text-gray-900;
+        }
+        .sidebar-link.active {
+            @apply bg-blue-50 text-blue-700;
+        }
+        .sidebar-link .icon {
+            @apply mr-3 text-[20px];
+        }
+        .status-pill {
+            @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+        }
+        .status-active {
+            @apply bg-green-100 text-green-800;
+        }
+        .status-inactive {
+            @apply bg-gray-100 text-gray-800;
+        }
+        .role-tag {
+            @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 mr-1 mb-1 border border-gray-200;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+<aside class="w-[var(--sidebar-width)] bg-white border-r border-[var(--border-color)] flex flex-col h-full flex-shrink-0 z-20">
+<div class="h-16 flex items-center px-6 border-b border-[var(--border-color)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-blue-600">build_circle</span>
+<span class="text-xl font-bold tracking-tight text-gray-900">Spanner</span>
+</div>
+</div>
+<nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+<a class="sidebar-link text-gray-600" href="#">
+<span class="material-symbols-outlined icon">dashboard</span>
+                Dashboard
+            </a>
+<a class="sidebar-link active" href="#">
+<span class="material-symbols-outlined icon fill-1">manage_accounts</span>
+                User Management
+            </a>
+<div class="pt-4 pb-1 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Modules
+            </div>
+<a class="sidebar-link text-gray-600" href="#">
+<span class="material-symbols-outlined icon">pie_chart</span>
+                Segments
+            </a>
+<a class="sidebar-link text-gray-600" href="#">
+<span class="material-symbols-outlined icon">domain</span>
+                Companies
+            </a>
+<a class="sidebar-link text-gray-600" href="#">
+<span class="material-symbols-outlined icon">contacts</span>
+                Contacts
+            </a>
+<a class="sidebar-link text-gray-600" href="#">
+<span class="material-symbols-outlined icon">playlist_add_check</span>
+                Approval Queue
+            </a>
+</nav>
+<div class="p-4 border-t border-[var(--border-color)]">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
+                    AU
+                </div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-gray-900 truncate">Admin User</p>
+<p class="text-xs text-gray-500 truncate">System Administrator</p>
+</div>
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+</button>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[var(--bg-body)]">
+<header class="bg-white border-b border-[var(--border-color)] h-16 flex items-center justify-between px-8 flex-shrink-0">
+<div>
+<h1 class="text-xl font-semibold text-gray-900">User Management</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-gray-400 hover:text-gray-500 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-red-500 border-2 border-white"></span>
+</button>
+<button class="p-2 text-gray-400 hover:text-gray-500">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-auto p-8">
+<div class="max-w-7xl mx-auto space-y-6">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div class="flex flex-1 items-center gap-3 w-full sm:w-auto">
+<div class="relative w-full sm:w-72">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-gray-400 text-[20px]">search</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" placeholder="Search by name or email" type="text"/>
+</div>
+<div class="relative">
+<select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white text-gray-600 cursor-pointer">
+<option>All Roles</option>
+<option>Admin</option>
+<option>Segment Owner</option>
+<option>Researcher</option>
+<option>Approver</option>
+<option>SDR</option>
+<option>Marketing</option>
+</select>
+</div>
+<div class="relative">
+<select class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md bg-white text-gray-600 cursor-pointer">
+<option>All Statuses</option>
+<option>Active</option>
+<option>Inactive</option>
+</select>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px] mr-2">add</span>
+                            Create User
+                        </button>
+</div>
+</div>
+<div class="bg-white shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg overflow-hidden">
+<div class="min-w-full inline-block align-middle">
+<div class="border-b border-gray-200">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]" scope="col">
+                                            Name
+                                        </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[25%]" scope="col">
+                                            Email
+                                        </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[20%]" scope="col">
+                                            Role(s)
+                                        </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[10%]" scope="col">
+                                            Status
+                                        </th>
+<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[15%]" scope="col">
+                                            Created At
+                                        </th>
+<th class="relative px-6 py-3 w-[5%]" scope="col">
+<span class="sr-only">Actions</span>
+</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200">
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs mr-3">
+                                                    AU
+                                                </div>
+<div class="text-sm font-medium text-gray-900">Admin User</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            admin@spanner.app
+                                        </td>
+<td class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+<span class="role-tag">Admin</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="status-pill status-active">
+                                                Active
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            Oct 12, 2023
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-9 w-9 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-xs mr-3">
+                                                    PA
+                                                </div>
+<div class="text-sm font-medium text-gray-900">Prashant Agarwal</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            prashant@spanner.app
+                                        </td>
+<td class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+<span class="role-tag">Segment Owner</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="status-pill status-active">
+                                                Active
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            Oct 14, 2023
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-9 w-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs mr-3">
+                                                    JR
+                                                </div>
+<div class="text-sm font-medium text-gray-900">Jane Researcher</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            jane@spanner.app
+                                        </td>
+<td class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+<span class="role-tag">Researcher</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="status-pill status-active">
+                                                Active
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            Oct 15, 2023
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-9 w-9 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs mr-3">
+                                                    BA
+                                                </div>
+<div class="text-sm font-medium text-gray-900">Bob Approver</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            bob@spanner.app
+                                        </td>
+<td class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+<span class="role-tag">Approver</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="status-pill status-active">
+                                                Active
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            Oct 18, 2023
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-9 w-9 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-xs mr-3">
+                                                    AS
+                                                </div>
+<div class="text-sm font-medium text-gray-900">Alice SDR</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            alice@spanner.app
+                                        </td>
+<td class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+<span class="role-tag">SDR</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="status-pill status-inactive">
+                                                Inactive
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            Oct 20, 2023
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-9 w-9 rounded-full bg-pink-100 flex items-center justify-center text-pink-700 font-bold text-xs mr-3">
+                                                    MM
+                                                </div>
+<div class="text-sm font-medium text-gray-900">Maria Marketing</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            maria@spanner.app
+                                        </td>
+<td class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+<span class="role-tag">Marketing</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="status-pill status-active">
+                                                Active
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            Oct 22, 2023
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="h-9 w-9 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold text-xs mr-3">
+                                                    DL
+                                                </div>
+<div class="text-sm font-medium text-gray-900">David Lead</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            david@spanner.app
+                                        </td>
+<td class="px-6 py-4 whitespace-normal text-sm text-gray-500">
+<span class="role-tag">Segment Owner</span>
+<span class="role-tag">Approver</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="status-pill status-active">
+                                                Active
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            Nov 01, 2023
+                                        </td>
+<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6 shadow-sm rounded-lg">
+<div class="flex flex-1 justify-between sm:hidden">
+<a class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="#">Previous</a>
+<a class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="#">Next</a>
+</div>
+<div class="hidden sm:flex flex-1 items-center justify-between">
+<div>
+<p class="text-sm text-gray-700">
+                                Showing
+                                <span class="font-medium">1</span>
+                                to
+                                <span class="font-medium">7</span>
+                                of
+                                <span class="font-medium">24</span>
+                                results
+                            </p>
+</div>
+<div>
+<nav aria-label="Pagination" class="isolate inline-flex -space-x-px rounded-md shadow-sm">
+<a class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Previous</span>
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</a>
+<a aria-current="page" class="relative z-10 inline-flex items-center bg-blue-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" href="#">1</a>
+<a class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0" href="#">2</a>
+<a class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0" href="#">3</a>
+<a class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Next</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

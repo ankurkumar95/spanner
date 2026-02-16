@@ -1,7 +1,7 @@
 # Jules Agent E — Users + Marketing + Workbench + Exports
 
-> **Run in PARALLEL** with Agents A, B, C, D (after Agent 0 is merged to main).
-> **Branch name:** `feature/users-marketing-workbench`
+> **Run in PARALLEL** with Agents A, B, C, D (after Agent 0 is merged to main).  
+> **Branch name:** `feature/users-marketing-workbench`  
 > **Base branch:** `main` (with Agent 0 merged)
 
 ---
