@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Plus, Building2, Users, AlertCircle, X, Check, Info, Search, Sparkles } from 'lucide-react';
+import { Plus, Building2, Users, AlertCircle, X, Check, Info, Search, Sparkles, Archive, Edit2, Save, Download } from 'lucide-react';
 import { format } from 'date-fns';
-import { useSegments, useSegment, useCreateSegment } from '../hooks/useSegments';
+import { useSegments, useSegment, useCreateSegment, useUpdateSegment, useArchiveSegment } from '../hooks/useSegments';
 import { useSearchOfferings, useCreateOffering } from '../hooks/useOfferings';
 import type { Offering } from '../hooks/useOfferings';
+import { useExportSegments } from '../hooks/useExports';
 import {
   DataTable,
   FilterBar,
@@ -25,6 +26,7 @@ export default function Segments() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedSegmentId, setSelectedSegmentId] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   // Create form state
   const [formName, setFormName] = useState('');
@@ -33,6 +35,11 @@ export default function Segments() {
   const [selectedOfferings, setSelectedOfferings] = useState<SelectedOffering[]>([]);
   const [offeringSearch, setOfferingSearch] = useState('');
 
+  // Edit form state
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editStatus, setEditStatus] = useState<'active' | 'archived'>('active');
+
   // Create offering confirmation popup state
   const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [newOfferingName, setNewOfferingName] = useState('');
@@ -40,6 +47,9 @@ export default function Segments() {
 
   const limit = 20;
   const createSegment = useCreateSegment();
+  const updateSegment = useUpdateSegment();
+  const archiveSegment = useArchiveSegment();
+  const exportSegments = useExportSegments();
   const createOffering = useCreateOffering();
 
   // Backend-searched offerings
@@ -221,13 +231,22 @@ export default function Segments() {
                 Manage your market segments and associated offerings
               </p>
             </div>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-150"
-            >
-              <Plus className="h-4 w-4" />
-              Create Segment
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => exportSegments()}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150"
+              >
+                <Download className="h-4 w-4" />
+                Export CSV
+              </button>
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-150"
+              >
+                <Plus className="h-4 w-4" />
+                Create Segment
+              </button>
+            </div>
           </div>
         </div>
 
@@ -277,90 +296,240 @@ export default function Segments() {
         {/* Detail Side Panel */}
         <SidePanel
           isOpen={!!selectedSegmentId}
-          onClose={() => setSelectedSegmentId(null)}
-          title="Segment Details"
+          onClose={() => {
+            setSelectedSegmentId(null);
+            setIsEditing(false);
+          }}
+          title={isEditing ? "Edit Segment" : "Segment Details"}
         >
           {isLoadingSegment ? (
             <div className="py-12">
               <LoadingSpinner size="lg" />
             </div>
           ) : selectedSegment ? (
-            <div className="space-y-6">
-              {/* Basic Info */}
-              <div>
-                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Basic Information</h3>
-                <div className="space-y-3">
+            <>
+              {!isEditing ? (
+                <div className="space-y-6">
+                  {/* Basic Info */}
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
-                      Name
-                    </label>
-                    <p className="text-sm text-slate-900 dark:text-white font-medium">{selectedSegment.name}</p>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
-                      Description
-                    </label>
-                    <p className="text-sm text-slate-900 dark:text-white">
-                      {selectedSegment.description || 'No description provided'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
-                      Status
-                    </label>
-                    <StatusBadge status={selectedSegment.status} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Offerings */}
-              <div>
-                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Offerings</h3>
-                {selectedSegment.offerings.length > 0 ? (
-                  <div className="space-y-2">
-                    {selectedSegment.offerings.map((offering) => (
-                      <div
-                        key={offering.id}
-                        className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"
-                      >
-                        <span className="text-sm font-medium text-slate-900 dark:text-white">
-                          {offering.name}
-                        </span>
-                        <StatusBadge status={offering.status} />
+                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Basic Information</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
+                          Name
+                        </label>
+                        <p className="text-sm text-slate-900 dark:text-white font-medium">{selectedSegment.name}</p>
                       </div>
-                    ))}
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
+                          Description
+                        </label>
+                        <p className="text-sm text-slate-900 dark:text-white">
+                          {selectedSegment.description || 'No description provided'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
+                          Status
+                        </label>
+                        <StatusBadge status={selectedSegment.status} />
+                      </div>
+                    </div>
                   </div>
-                ) : (
-                  <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm text-slate-600 dark:text-slate-400">
-                    <AlertCircle className="h-4 w-4" />
-                    No offerings associated with this segment
-                  </div>
-                )}
-              </div>
 
-              {/* Metadata */}
-              <div>
-                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Metadata</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Created</span>
-                    <span className="text-slate-900 dark:text-white font-medium">
-                      {format(new Date(selectedSegment.created_at), 'MMM d, yyyy h:mm a')}
-                    </span>
+                  {/* Offerings */}
+                  <div>
+                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Offerings</h3>
+                    {selectedSegment.offerings.length > 0 ? (
+                      <div className="space-y-2">
+                        {selectedSegment.offerings.map((offering) => (
+                          <div
+                            key={offering.id}
+                            className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 rounded-lg"
+                          >
+                            <span className="text-sm font-medium text-slate-900 dark:text-white">
+                              {offering.name}
+                            </span>
+                            <StatusBadge status={offering.status} />
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm text-slate-600 dark:text-slate-400">
+                        <AlertCircle className="h-4 w-4" />
+                        No offerings associated with this segment
+                      </div>
+                    )}
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Last Updated</span>
-                    <span className="text-slate-900 dark:text-white font-medium">
-                      {format(new Date(selectedSegment.updated_at), 'MMM d, yyyy h:mm a')}
-                    </span>
+
+                  {/* Metadata */}
+                  <div>
+                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Metadata</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-400">Created</span>
+                        <span className="text-slate-900 dark:text-white font-medium">
+                          {format(new Date(selectedSegment.created_at), 'MMM d, yyyy h:mm a')}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-400">Last Updated</span>
+                        <span className="text-slate-900 dark:text-white font-medium">
+                          {format(new Date(selectedSegment.updated_at), 'MMM d, yyyy h:mm a')}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-400">Created By</span>
+                        <span className="text-slate-900 dark:text-white font-medium">{selectedSegment.created_by_name || selectedSegment.created_by}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Created By</span>
-                    <span className="text-slate-900 dark:text-white font-medium">{selectedSegment.created_by_name || selectedSegment.created_by}</span>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <button
+                      onClick={() => {
+                        setEditName(selectedSegment.name);
+                        setEditDescription(selectedSegment.description || '');
+                        setEditStatus(selectedSegment.status as 'active' | 'archived');
+                        setIsEditing(true);
+                      }}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                    >
+                      <Edit2 className="h-4 w-4" />
+                      Edit
+                    </button>
+                    {selectedSegment.status === 'active' && (
+                      <button
+                        onClick={async () => {
+                          try {
+                            await archiveSegment.mutateAsync(selectedSegment.id);
+                            setSelectedSegmentId(null);
+                          } catch {
+                            // Error handled by mutation
+                          }
+                        }}
+                        disabled={archiveSegment.isPending}
+                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        {archiveSegment.isPending ? (
+                          <>
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-400 border-r-transparent" />
+                            Archiving...
+                          </>
+                        ) : (
+                          <>
+                            <Archive className="h-4 w-4" />
+                            Archive
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
-              </div>
-            </div>
+              ) : (
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    try {
+                      await updateSegment.mutateAsync({
+                        id: selectedSegment.id,
+                        data: {
+                          name: editName,
+                          description: editDescription || undefined,
+                        },
+                      });
+                      setIsEditing(false);
+                    } catch {
+                      // Error handled by mutation
+                    }
+                  }}
+                  className="space-y-6"
+                >
+                  {/* Edit Form */}
+                  <div className="space-y-4">
+                    <div>
+                      <label
+                        htmlFor="edit-name"
+                        className="block text-sm font-medium text-slate-900 dark:text-white mb-1.5"
+                      >
+                        Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        id="edit-name"
+                        type="text"
+                        required
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="edit-description"
+                        className="block text-sm font-medium text-slate-900 dark:text-white mb-1.5"
+                      >
+                        Description
+                      </label>
+                      <textarea
+                        id="edit-description"
+                        rows={3}
+                        value={editDescription}
+                        onChange={(e) => setEditDescription(e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm resize-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label
+                        htmlFor="edit-status"
+                        className="block text-sm font-medium text-slate-900 dark:text-white mb-1.5"
+                      >
+                        Status
+                      </label>
+                      <select
+                        id="edit-status"
+                        value={editStatus}
+                        onChange={(e) => setEditStatus(e.target.value as 'active' | 'archived')}
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                      >
+                        <option value="active">Active</option>
+                        <option value="archived">Archived</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Form Actions */}
+                  <div className="flex items-center gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
+                      className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={updateSegment.isPending || !editName.trim()}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      {updateSegment.isPending ? (
+                        <>
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-r-transparent" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4" />
+                          Save
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </>
           ) : null}
         </SidePanel>
 

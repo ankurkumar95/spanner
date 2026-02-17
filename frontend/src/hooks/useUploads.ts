@@ -18,7 +18,7 @@ export function useUploadBatches(params: UploadBatchesParams = {}) {
   return useQuery({
     queryKey: ['upload-batches', params],
     queryFn: async () => {
-      const response = await api.get<PaginatedResponse<UploadBatch>>('/uploads/batches', {
+      const response = await api.get<PaginatedResponse<UploadBatch>>('/uploads/', {
         params: {
           skip: params.skip || 0,
           limit: params.limit || 20,
@@ -35,7 +35,7 @@ export function useUploadBatch(id: string) {
   return useQuery({
     queryKey: ['upload-batch', id],
     queryFn: async () => {
-      const response = await api.get<UploadBatch>(`/uploads/batches/${id}`);
+      const response = await api.get<UploadBatch>(`/uploads/${id}`);
       return response.data;
     },
     enabled: !!id,
@@ -94,7 +94,7 @@ export function useUploadErrors(batchId: string) {
   return useQuery({
     queryKey: ['upload-errors', batchId],
     queryFn: async () => {
-      const response = await api.get<UploadError[]>(`/uploads/batches/${batchId}/errors`);
+      const response = await api.get<UploadError[]>(`/uploads/${batchId}/errors`);
       return response.data;
     },
     enabled: !!batchId,

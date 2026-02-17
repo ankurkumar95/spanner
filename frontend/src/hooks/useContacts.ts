@@ -37,7 +37,7 @@ interface CreateContactData {
 interface UpdateContactData extends Partial<CreateContactData> {}
 
 interface AssignContactData {
-  sdr_id: string;
+  assigned_sdr_id: string;
 }
 
 export function useContacts(params: ContactsParams = {}) {
@@ -134,6 +134,46 @@ export function useApproveContact() {
     },
     onError: (error: unknown) => {
       const message = error instanceof Error ? error.message : 'Failed to approve contact';
+      toast.error(message);
+    },
+  });
+}
+
+export function useMeetingScheduled() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await api.post<Contact>(`/contacts/${id}/meeting-scheduled`);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      queryClient.invalidateQueries({ queryKey: ['contact', data.id] });
+      toast.success('Meeting scheduled');
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : 'Failed to mark meeting scheduled';
+      toast.error(message);
+    },
+  });
+}
+
+export function useMarkContactDuplicate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, is_duplicate }: { id: string; is_duplicate: boolean }) => {
+      const response = await api.post<Contact>(`/contacts/${id}/duplicate`, { is_duplicate });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      queryClient.invalidateQueries({ queryKey: ['contact', data.id] });
+      toast.success(data.is_duplicate ? 'Marked as duplicate' : 'Unmarked as duplicate');
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : 'Failed to update duplicate status';
       toast.error(message);
     },
   });

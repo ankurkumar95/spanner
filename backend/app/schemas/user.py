@@ -97,7 +97,7 @@ class UserResponse(UserBrief):
 
     created_at: datetime
     updated_at: datetime
-    roles: list[UserRoleResponse] = Field(default_factory=list, alias="user_roles")
+    roles: list[str] = Field(default_factory=list)
     preferences: UserPreferenceResponse | None = None
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)

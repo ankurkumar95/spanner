@@ -91,6 +91,7 @@ export interface Contact {
   mobile_phone: string | null;
   job_title: string | null;
   direct_phone_number: string | null;
+  contact_linkedin_url: string | null;
   company_id: string;
   segment_id: string;
   status: 'uploaded' | 'approved' | 'assigned_to_sdr' | 'meeting_scheduled';

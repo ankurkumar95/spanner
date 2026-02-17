@@ -65,12 +65,12 @@ async def list_companies(
 async def create_company(
     data: CompanyCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_roles("researcher", "admin"))
+    current_user: dict = Depends(require_roles("researcher", "approver", "admin"))
 ):
     """
     Create a new company.
 
-    Requires researcher or admin role.
+    Requires researcher, approver, or admin role.
     Company is created with pending status.
     """
     try:

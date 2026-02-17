@@ -49,7 +49,7 @@ async def create_company(
 
     db.add(company)
     await db.flush()
-    await db.refresh(company)
+    await db.refresh(company, ["segment", "created_by_user"])
 
     return company
 
@@ -206,7 +206,7 @@ async def update_company(
         setattr(company, field, value)
 
     await db.flush()
-    await db.refresh(company)
+    await db.refresh(company, ["segment", "created_by_user"])
 
     return company
 
@@ -247,7 +247,7 @@ async def approve_company(
     company.rejection_reason = approval.rejection_reason
 
     await db.flush()
-    await db.refresh(company)
+    await db.refresh(company, ["segment", "created_by_user"])
 
     return company
 
@@ -326,7 +326,7 @@ async def mark_duplicate(
     company.is_duplicate = is_duplicate
 
     await db.flush()
-    await db.refresh(company)
+    await db.refresh(company, ["segment", "created_by_user"])
 
     return company
 

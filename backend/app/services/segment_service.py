@@ -55,7 +55,7 @@ async def create_segment(
             db.add(segment_offering)
 
     await db.flush()
-    await db.refresh(segment, ["offerings"])
+    await db.refresh(segment, ["offerings", "created_by_user"])
 
     return segment
 
@@ -203,7 +203,7 @@ async def update_segment(
             db.add(segment_offering)
 
     await db.flush()
-    await db.refresh(segment, ["offerings"])
+    await db.refresh(segment, ["offerings", "created_by_user"])
 
     return segment
 

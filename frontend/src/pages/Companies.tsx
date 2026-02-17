@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Plus, ExternalLink, MapPin, Users, Upload as UploadIcon, Package, X, Settings, Tag, Search, Phone, Linkedin, Calendar } from 'lucide-react';
+import { Plus, ExternalLink, MapPin, Users, Upload as UploadIcon, Package, X, Settings, Tag, Search, Phone, Linkedin, Calendar, Download } from 'lucide-react';
 import { format } from 'date-fns';
-import { useCompanies, useCompany, useCreateCompany } from '../hooks/useCompanies';
+import { useCompanies, useCompany, useCreateCompany, useUpdateCompany, useMarkCompanyDuplicate } from '../hooks/useCompanies';
 import { useSegments } from '../hooks/useSegments';
+import { useExportCompanies } from '../hooks/useExports';
 import {
   DataTable,
   FilterBar,
@@ -23,9 +24,13 @@ export default function Companies() {
   const [selectedCompanyId, setSelectedCompanyId] = useState<string | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const limit = 20;
   const createCompany = useCreateCompany();
+  const updateCompany = useUpdateCompany();
+  const markCompanyDuplicate = useMarkCompanyDuplicate();
+  const exportCompanies = useExportCompanies();
 
   const { data, isLoading } = useCompanies({
     skip,
@@ -93,6 +98,43 @@ export default function Companies() {
     } catch (error) {
       // Error is handled by the mutation's onError
     }
+  };
+
+  const handleUpdateCompany = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedCompanyId) return;
+
+    const formData = new FormData(e.currentTarget);
+    const founded_year_str = formData.get('founded_year') as string;
+
+    await updateCompany.mutateAsync({
+      id: selectedCompanyId,
+      data: {
+        company_name: formData.get('company_name') as string,
+        company_website: (formData.get('company_website') as string) || undefined,
+        company_phone: (formData.get('company_phone') as string) || undefined,
+        company_industry: (formData.get('company_industry') as string) || undefined,
+        company_sub_industry: (formData.get('company_sub_industry') as string) || undefined,
+        company_description: (formData.get('company_description') as string) || undefined,
+        street: (formData.get('street') as string) || undefined,
+        city: (formData.get('city') as string) || undefined,
+        state_province: (formData.get('state_province') as string) || undefined,
+        country_region: (formData.get('country_region') as string) || undefined,
+        zip_postal_code: (formData.get('zip_postal_code') as string) || undefined,
+        revenue_range: (formData.get('revenue_range') as string) || undefined,
+        employee_size_range: (formData.get('employee_size_range') as string) || undefined,
+        founded_year: founded_year_str ? parseInt(founded_year_str, 10) : undefined,
+      },
+    });
+    setIsEditing(false);
+  };
+
+  const handleMarkDuplicate = async () => {
+    if (!selectedCompanyId || !selectedCompany) return;
+    await markCompanyDuplicate.mutateAsync({
+      id: selectedCompanyId,
+      is_duplicate: !selectedCompany.is_duplicate,
+    });
   };
 
   const columns: ColumnConfig<CompanyWithContacts>[] = [
@@ -217,6 +259,13 @@ export default function Companies() {
             </div>
             <div className="flex gap-3">
               <button
+                onClick={() => exportCompanies({ segment_id: segmentFilter !== 'all' ? segmentFilter : undefined, status: statusFilter !== 'all' ? statusFilter : undefined })}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150"
+              >
+                <Download className="h-4 w-4" />
+                Export CSV
+              </button>
+              <button
                 onClick={() => setIsUploadModalOpen(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150"
               >
@@ -271,15 +320,19 @@ export default function Companies() {
         {/* Detail Side Panel */}
         <SidePanel
           isOpen={!!selectedCompanyId}
-          onClose={() => setSelectedCompanyId(null)}
-          title="Company Details"
+          onClose={() => {
+            setSelectedCompanyId(null);
+            setIsEditing(false);
+          }}
+          title={isEditing ? 'Edit Company' : 'Company Details'}
         >
           {isLoadingCompany ? (
             <div className="py-12">
               <LoadingSpinner size="lg" />
             </div>
           ) : selectedCompany ? (
-            <div className="space-y-6">
+            !isEditing ? (
+              <div className="space-y-6">
               {/* Basic Info */}
               <div>
                 <h3 className="text-sm font-medium text-slate-500 mb-3">Company Information</h3>
@@ -461,7 +514,238 @@ export default function Companies() {
                   </div>
                 </div>
               </div>
+
+              {/* Actions */}
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="flex-1 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-150"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={handleMarkDuplicate}
+                    disabled={markCompanyDuplicate.isPending}
+                    className="flex-1 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {selectedCompany.is_duplicate ? 'Unmark Duplicate' : 'Mark Duplicate'}
+                  </button>
+                </div>
+              </div>
             </div>
+            ) : (
+              /* Edit Form */
+              <form onSubmit={handleUpdateCompany} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Company Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="company_name"
+                    defaultValue={selectedCompany.company_name}
+                    required
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Website
+                  </label>
+                  <input
+                    type="text"
+                    name="company_website"
+                    defaultValue={selectedCompany.company_website || ''}
+                    placeholder="https://example.com"
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Phone
+                  </label>
+                  <input
+                    type="text"
+                    name="company_phone"
+                    defaultValue={selectedCompany.company_phone || ''}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Industry
+                  </label>
+                  <input
+                    type="text"
+                    name="company_industry"
+                    defaultValue={selectedCompany.company_industry || ''}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Sub-Industry
+                  </label>
+                  <input
+                    type="text"
+                    name="company_sub_industry"
+                    defaultValue={selectedCompany.company_sub_industry || ''}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Description
+                  </label>
+                  <textarea
+                    name="company_description"
+                    defaultValue={selectedCompany.company_description || ''}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Street Address
+                  </label>
+                  <input
+                    type="text"
+                    name="street"
+                    defaultValue={selectedCompany.street || ''}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      name="city"
+                      defaultValue={selectedCompany.city || ''}
+                      className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      State/Province
+                    </label>
+                    <input
+                      type="text"
+                      name="state_province"
+                      defaultValue={selectedCompany.state_province || ''}
+                      className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      Country/Region
+                    </label>
+                    <input
+                      type="text"
+                      name="country_region"
+                      defaultValue={selectedCompany.country_region || ''}
+                      className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                      Zip/Postal Code
+                    </label>
+                    <input
+                      type="text"
+                      name="zip_postal_code"
+                      defaultValue={selectedCompany.zip_postal_code || ''}
+                      className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Revenue Range
+                  </label>
+                  <select
+                    name="revenue_range"
+                    defaultValue={selectedCompany.revenue_range || ''}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="">Select range</option>
+                    <option value="< $1M">{"< $1M"}</option>
+                    <option value="$1M - $10M">$1M - $10M</option>
+                    <option value="$10M - $50M">$10M - $50M</option>
+                    <option value="$50M - $100M">$50M - $100M</option>
+                    <option value="$100M - $500M">$100M - $500M</option>
+                    <option value="$500M - $1B">$500M - $1B</option>
+                    <option value="> $1B">{"> $1B"}</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Employee Size Range
+                  </label>
+                  <select
+                    name="employee_size_range"
+                    defaultValue={selectedCompany.employee_size_range || ''}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  >
+                    <option value="">Select range</option>
+                    <option value="1-10">1-10</option>
+                    <option value="11-50">11-50</option>
+                    <option value="51-200">51-200</option>
+                    <option value="201-500">201-500</option>
+                    <option value="501-1000">501-1000</option>
+                    <option value="1001-5000">1001-5000</option>
+                    <option value="5000+">5000+</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                    Founded Year
+                  </label>
+                  <input
+                    type="number"
+                    name="founded_year"
+                    defaultValue={selectedCompany.founded_year || ''}
+                    min="1800"
+                    max="2100"
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    disabled={updateCompany.isPending}
+                    className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={updateCompany.isPending}
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {updateCompany.isPending ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </div>
+              </form>
+            )
           ) : null}
         </SidePanel>
 

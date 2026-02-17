@@ -74,7 +74,7 @@ async def create_contact(
 
     db.add(contact)
     await db.flush()
-    await db.refresh(contact, ["company", "segment"])
+    await db.refresh(contact, ["company", "segment", "created_by_user"])
 
     return contact
 
@@ -263,7 +263,7 @@ async def update_contact(
             setattr(contact, field, value)
 
     await db.flush()
-    await db.refresh(contact, ["company", "segment"])
+    await db.refresh(contact, ["company", "segment", "created_by_user"])
 
     return contact
 
@@ -306,7 +306,7 @@ async def approve_contact(
     contact.status = ContactStatusEnum.APPROVED
 
     await db.flush()
-    await db.refresh(contact, ["company", "segment"])
+    await db.refresh(contact, ["company", "segment", "created_by_user"])
 
     return contact
 
@@ -346,7 +346,7 @@ async def assign_to_sdr(
     contact.status = ContactStatusEnum.ASSIGNED_TO_SDR
 
     await db.flush()
-    await db.refresh(contact, ["company", "segment"])
+    await db.refresh(contact, ["company", "segment", "created_by_user"])
 
     return contact
 
@@ -393,7 +393,7 @@ async def bulk_assign_to_sdr(
     await db.flush()
 
     for contact in contacts:
-        await db.refresh(contact, ["company", "segment"])
+        await db.refresh(contact, ["company", "segment", "created_by_user"])
 
     return contacts
 
@@ -430,7 +430,7 @@ async def mark_meeting_scheduled(
     contact.status = ContactStatusEnum.MEETING_SCHEDULED
 
     await db.flush()
-    await db.refresh(contact, ["company", "segment"])
+    await db.refresh(contact, ["company", "segment", "created_by_user"])
 
     return contact
 
@@ -462,7 +462,7 @@ async def mark_duplicate(
     contact.is_duplicate = is_duplicate
 
     await db.flush()
-    await db.refresh(contact, ["company", "segment"])
+    await db.refresh(contact, ["company", "segment", "created_by_user"])
 
     return contact
 

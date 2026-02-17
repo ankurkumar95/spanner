@@ -1,7 +1,9 @@
 import { useState, useRef } from 'react';
-import { Plus, Mail, Phone, Building2, User, Upload as UploadIcon, X, Linkedin } from 'lucide-react';
+import { Plus, Mail, Phone, Building2, User, Upload as UploadIcon, X, Linkedin, Download } from 'lucide-react';
 import { format } from 'date-fns';
-import { useContacts, useContact, useCreateContact } from '../hooks/useContacts';
+import { useContacts, useContact, useCreateContact, useUpdateContact, useAssignContact, useMeetingScheduled, useMarkContactDuplicate } from '../hooks/useContacts';
+import { useExportContacts } from '../hooks/useExports';
+import { useUsers } from '../hooks/useUsers';
 import { useSegments } from '../hooks/useSegments';
 import { useCompanies } from '../hooks/useCompanies';
 import {
@@ -25,10 +27,22 @@ export default function Contacts() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [saveAndAddAnother, setSaveAndAddAnother] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [selectedSdrId, setSelectedSdrId] = useState('');
   const createFormRef = useRef<HTMLFormElement>(null);
 
   const limit = 20;
   const createContact = useCreateContact();
+  const updateContact = useUpdateContact();
+  const assignContact = useAssignContact();
+  const meetingScheduled = useMeetingScheduled();
+  const markContactDuplicate = useMarkContactDuplicate();
+  const exportContacts = useExportContacts();
+
+  // Fetch SDR users for assignment dropdown
+  const { data: usersData } = useUsers({ limit: 100 });
+  const sdrUsers = usersData?.items.filter(u => u.roles.includes('sdr') && u.status === 'active') || [];
 
   const { data, isLoading } = useContacts({
     skip,
@@ -104,6 +118,42 @@ export default function Contacts() {
     }
   };
 
+  const handleUpdateContact = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!selectedContactId) return;
+
+    const formData = new FormData(e.currentTarget);
+    await updateContact.mutateAsync({
+      id: selectedContactId,
+      data: {
+        first_name: formData.get('first_name') as string,
+        last_name: formData.get('last_name') as string,
+        email: formData.get('email') as string,
+        job_title: (formData.get('job_title') as string) || undefined,
+        mobile_phone: (formData.get('mobile_phone') as string) || undefined,
+        direct_phone_number: (formData.get('direct_phone_number') as string) || undefined,
+        contact_linkedin_url: (formData.get('contact_linkedin_url') as string) || undefined,
+      },
+    });
+    setIsEditing(false);
+  };
+
+  const handleAssignToSdr = async () => {
+    if (!selectedContactId || !selectedSdrId) return;
+
+    await assignContact.mutateAsync({
+      id: selectedContactId,
+      data: { assigned_sdr_id: selectedSdrId },
+    });
+    setIsAssignModalOpen(false);
+    setSelectedSdrId('');
+  };
+
+  const getSdrName = (sdrId: string) => {
+    const user = usersData?.items.find(u => u.id === sdrId);
+    return user?.name || sdrId.slice(0, 8) + '...';
+  };
+
   const columns: ColumnConfig<Contact>[] = [
     {
       key: 'name',
@@ -174,7 +224,7 @@ export default function Contacts() {
       render: (item) => (
         <span className="text-slate-600 dark:text-slate-400 text-sm">
           {item.assigned_sdr_id ? (
-            <span className="font-medium">{item.assigned_sdr_id.slice(0, 8)}...</span>
+            <span className="font-medium">{getSdrName(item.assigned_sdr_id)}</span>
           ) : (
             '—'
           )}
@@ -226,6 +276,13 @@ export default function Contacts() {
               </p>
             </div>
             <div className="flex gap-3">
+              <button
+                onClick={() => exportContacts({ segment_id: segmentFilter !== 'all' ? segmentFilter : undefined, status: statusFilter !== 'all' ? statusFilter : undefined })}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150"
+              >
+                <Download className="h-4 w-4" />
+                Export CSV
+              </button>
               <button
                 onClick={() => setIsUploadModalOpen(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150"
@@ -281,171 +338,370 @@ export default function Contacts() {
         {/* Detail Side Panel */}
         <SidePanel
           isOpen={!!selectedContactId}
-          onClose={() => setSelectedContactId(null)}
-          title="Contact Details"
+          onClose={() => {
+            setSelectedContactId(null);
+            setIsEditing(false);
+          }}
+          title={isEditing ? 'Edit Contact' : 'Contact Details'}
         >
           {isLoadingContact ? (
             <div className="py-12">
               <LoadingSpinner size="lg" />
             </div>
           ) : selectedContact ? (
-            <div className="space-y-6">
-              {/* Profile */}
-              <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                  <User className="h-8 w-8 text-primary-600" />
+            !isEditing ? (
+              <div className="space-y-6">
+                {/* Profile */}
+                <div className="flex items-center gap-4">
+                  <div className="h-16 w-16 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                    <User className="h-8 w-8 text-primary-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                      {selectedContact.first_name} {selectedContact.last_name}
+                    </h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">{selectedContact.job_title || 'No title'}</p>
+                  </div>
                 </div>
+
+                {/* Status */}
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                    {selectedContact.first_name} {selectedContact.last_name}
-                  </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">{selectedContact.job_title || 'No title'}</p>
+                  <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">Status</label>
+                  <div className="flex items-center gap-2">
+                    <StatusBadge status={selectedContact.status} />
+                    {selectedContact.is_duplicate && (
+                      <span className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 px-2 py-1 rounded border border-amber-200 dark:border-amber-700">
+                        Duplicate
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Status */}
-              <div>
-                <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-2">Status</label>
-                <div className="flex items-center gap-2">
-                  <StatusBadge status={selectedContact.status} />
-                  {selectedContact.is_duplicate && (
-                    <span className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 px-2 py-1 rounded border border-amber-200 dark:border-amber-700">
-                      Duplicate
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Contact Information */}
-              <div>
-                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Contact Information</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                      <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                {/* Contact Information */}
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Contact Information</h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                        <Mail className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium text-slate-400 dark:text-slate-500">Email</p>
+                        <a
+                          href={`mailto:${selectedContact.email}`}
+                          className="text-sm text-primary-600 hover:text-primary-700 break-all"
+                        >
+                          {selectedContact.email}
+                        </a>
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-slate-400 dark:text-slate-500">Email</p>
-                      <a
-                        href={`mailto:${selectedContact.email}`}
-                        className="text-sm text-primary-600 hover:text-primary-700 break-all"
+
+                    {selectedContact.mobile_phone && (
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                          <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-slate-400 dark:text-slate-500">Mobile Phone</p>
+                          <a
+                            href={`tel:${selectedContact.mobile_phone}`}
+                            className="text-sm text-slate-900 dark:text-white font-medium"
+                          >
+                            {selectedContact.mobile_phone}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedContact.direct_phone_number && (
+                      <div className="flex items-center gap-3">
+                        <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
+                          <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-slate-400 dark:text-slate-500">Direct Phone</p>
+                          <a
+                            href={`tel:${selectedContact.direct_phone_number}`}
+                            className="text-sm text-slate-900 dark:text-white font-medium"
+                          >
+                            {selectedContact.direct_phone_number}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Company & Segment */}
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Organization</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-600 dark:text-slate-400">Company</span>
+                      <span className="text-slate-900 dark:text-white font-medium">
+                        {getCompanyName(selectedContact.company_id)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-600 dark:text-slate-400">Segment</span>
+                      <span className="text-slate-900 dark:text-white font-medium">
+                        {segmentsData?.items.find((s) => s.id === selectedContact.segment_id)?.name ||
+                          'Unknown'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Assignment */}
+                {selectedContact.assigned_sdr_id && (
+                  <div>
+                    <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Assignment</h3>
+                    <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">Assigned SDR</p>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">
+                            {getSdrName(selectedContact.assigned_sdr_id)}
+                          </p>
+                        </div>
+                        <User className="h-5 w-5 text-slate-400 dark:text-slate-500" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metadata */}
+                <div>
+                  <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Metadata</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-slate-600 dark:text-slate-400">Created</span>
+                      <span className="text-slate-900 dark:text-white font-medium">
+                        {format(new Date(selectedContact.created_at), 'MMM d, yyyy h:mm a')}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-600 dark:text-slate-400">Last Updated</span>
+                      <span className="text-slate-900 dark:text-white font-medium">
+                        {format(new Date(selectedContact.updated_at), 'MMM d, yyyy h:mm a')}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-slate-600 dark:text-slate-400">Created By</span>
+                      <span className="text-slate-900 dark:text-white font-medium">{selectedContact.created_by_name || selectedContact.created_by}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+                  <div className="space-y-3">
+                    {/* Primary action buttons based on status */}
+                    <div className="flex gap-3">
+                      {selectedContact.status === 'approved' && (
+                        <button
+                          onClick={() => {
+                            setSelectedSdrId('');
+                            setIsAssignModalOpen(true);
+                          }}
+                          className="flex-1 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-150"
+                        >
+                          Assign to SDR
+                        </button>
+                      )}
+                      {selectedContact.status === 'assigned_to_sdr' && (
+                        <button
+                          onClick={async () => {
+                            await meetingScheduled.mutateAsync(selectedContactId!);
+                          }}
+                          disabled={meetingScheduled.isPending}
+                          className="flex-1 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {meetingScheduled.isPending ? 'Updating...' : 'Mark Meeting Scheduled'}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="flex-1 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150"
                       >
-                        {selectedContact.email}
-                      </a>
+                        Edit
+                      </button>
                     </div>
-                  </div>
-
-                  {selectedContact.mobile_phone && (
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                        <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-slate-400 dark:text-slate-500">Mobile Phone</p>
-                        <a
-                          href={`tel:${selectedContact.mobile_phone}`}
-                          className="text-sm text-slate-900 dark:text-white font-medium"
-                        >
-                          {selectedContact.mobile_phone}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedContact.direct_phone_number && (
-                    <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                        <Phone className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs font-medium text-slate-400 dark:text-slate-500">Direct Phone</p>
-                        <a
-                          href={`tel:${selectedContact.direct_phone_number}`}
-                          className="text-sm text-slate-900 dark:text-white font-medium"
-                        >
-                          {selectedContact.direct_phone_number}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Company & Segment */}
-              <div>
-                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Organization</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Company</span>
-                    <span className="text-slate-900 dark:text-white font-medium">
-                      {getCompanyName(selectedContact.company_id)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Segment</span>
-                    <span className="text-slate-900 dark:text-white font-medium">
-                      {segmentsData?.items.find((s) => s.id === selectedContact.segment_id)?.name ||
-                        'Unknown'}
-                    </span>
+                    {/* Duplicate toggle */}
+                    <button
+                      onClick={async () => {
+                        await markContactDuplicate.mutateAsync({ id: selectedContactId!, is_duplicate: !selectedContact.is_duplicate });
+                      }}
+                      disabled={markContactDuplicate.isPending}
+                      className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {markContactDuplicate.isPending ? 'Updating...' : (selectedContact.is_duplicate ? 'Unmark Duplicate' : 'Mark Duplicate')}
+                    </button>
                   </div>
                 </div>
               </div>
+            ) : (
+              /* Edit Form */
+              <form onSubmit={handleUpdateContact} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">First Name *</label>
+                    <input
+                      type="text"
+                      name="first_name"
+                      defaultValue={selectedContact.first_name}
+                      required
+                      className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Last Name *</label>
+                    <input
+                      type="text"
+                      name="last_name"
+                      defaultValue={selectedContact.last_name}
+                      required
+                      className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
 
-              {/* Assignment */}
-              {selectedContact.assigned_sdr_id && (
                 <div>
-                  <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Assignment</h3>
-                  <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">Assigned SDR</p>
-                        <p className="text-sm font-medium text-slate-900 dark:text-white">
-                          {selectedContact.assigned_sdr_id}
-                        </p>
-                      </div>
-                      <User className="h-5 w-5 text-slate-400 dark:text-slate-500" />
-                    </div>
-                  </div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email *</label>
+                  <input
+                    type="email"
+                    name="email"
+                    defaultValue={selectedContact.email}
+                    required
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
                 </div>
-              )}
 
-              {/* Metadata */}
-              <div>
-                <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">Metadata</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Created</span>
-                    <span className="text-slate-900 dark:text-white font-medium">
-                      {format(new Date(selectedContact.created_at), 'MMM d, yyyy h:mm a')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Last Updated</span>
-                    <span className="text-slate-900 dark:text-white font-medium">
-                      {format(new Date(selectedContact.updated_at), 'MMM d, yyyy h:mm a')}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Created By</span>
-                    <span className="text-slate-900 dark:text-white font-medium">{selectedContact.created_by_name || selectedContact.created_by}</span>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Job Title</label>
+                  <input
+                    type="text"
+                    name="job_title"
+                    defaultValue={selectedContact.job_title || ''}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
                 </div>
-              </div>
 
-              {/* Actions */}
-              <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-                <div className="flex gap-3">
-                  <button className="flex-1 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 transition-colors duration-150">
-                    Assign to SDR
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Mobile Phone</label>
+                  <input
+                    type="text"
+                    name="mobile_phone"
+                    defaultValue={selectedContact.mobile_phone || ''}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Direct Phone</label>
+                  <input
+                    type="text"
+                    name="direct_phone_number"
+                    defaultValue={selectedContact.direct_phone_number || ''}
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">LinkedIn URL</label>
+                  <input
+                    type="text"
+                    name="contact_linkedin_url"
+                    defaultValue={selectedContact.contact_linkedin_url || ''}
+                    placeholder="https://linkedin.com/in/username"
+                    className="w-full px-3 py-2 border border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    disabled={updateContact.isPending}
+                    className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Cancel
                   </button>
-                  <button className="flex-1 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-150">
-                    Edit
+                  <button
+                    type="submit"
+                    disabled={updateContact.isPending}
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {updateContact.isPending ? 'Saving...' : 'Save Changes'}
                   </button>
+                </div>
+              </form>
+            )
+          ) : null}
+        </SidePanel>
+
+        {/* SDR Assignment Modal */}
+        {isAssignModalOpen && selectedContact && (
+          <div className="fixed inset-0 z-50 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4">
+              <div
+                className="fixed inset-0 bg-slate-900/50 dark:bg-slate-950/70 transition-opacity"
+                onClick={() => setIsAssignModalOpen(false)}
+              />
+              <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-700">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Assign to SDR</h2>
+                  <button
+                    onClick={() => setIsAssignModalOpen(false)}
+                    className="text-slate-400 dark:text-slate-500 hover:text-slate-500 dark:hover:text-slate-400 transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="p-6 space-y-4">
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Assign <span className="font-medium text-slate-900 dark:text-white">{selectedContact.first_name} {selectedContact.last_name}</span> to an SDR.
+                  </p>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Select SDR *
+                    </label>
+                    <select
+                      value={selectedSdrId}
+                      onChange={(e) => setSelectedSdrId(e.target.value)}
+                      className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="">Choose an SDR...</option>
+                      {sdrUsers.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.name} ({user.email})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsAssignModalOpen(false)}
+                      disabled={assignContact.isPending}
+                      className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAssignToSdr}
+                      disabled={!selectedSdrId || assignContact.isPending}
+                      className="flex-1 px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {assignContact.isPending ? 'Assigning...' : 'Assign'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          ) : null}
-        </SidePanel>
+          </div>
+        )}
 
         <UploadModal
           isOpen={isUploadModalOpen}

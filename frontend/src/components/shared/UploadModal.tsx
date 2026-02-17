@@ -1,7 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { X, Upload, CheckCircle, AlertCircle, FileText } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useUploadCompanies, useUploadContacts } from '../../hooks/useUploads';
 import { useSegments } from '../../hooks/useSegments';
+import { api } from '../../lib/api';
 import { UploadBatch } from '../../types';
 
 interface UploadModalProps {
@@ -14,11 +16,22 @@ interface UploadModalProps {
 export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [selectedSegment, setSelectedSegment] = useState(segmentId || '');
+  const [selectedCompany, setSelectedCompany] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [uploadResult, setUploadResult] = useState<UploadBatch | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: segmentsData } = useSegments({ limit: 100 });
+  const { data: companiesData, isLoading: isLoadingCompanies } = useQuery({
+    queryKey: ['companies', 'upload-modal', selectedSegment],
+    queryFn: async () => {
+      const response = await api.get<{ items: { id: string; company_name: string }[]; total: number }>('/companies/', {
+        params: { segment_id: selectedSegment, limit: 100 },
+      });
+      return response.data;
+    },
+    enabled: !!selectedSegment && uploadType === 'contact',
+  });
   const uploadCompanies = useUploadCompanies();
   const uploadContacts = useUploadContacts();
 
@@ -56,10 +69,17 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
       return;
     }
 
+    if (uploadType === 'contact' && (!selectedSegment || !selectedCompany)) {
+      return;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
-    if (uploadType === 'company' && selectedSegment) {
+
+    if (uploadType === 'company') {
       formData.append('segment_id', selectedSegment);
+    } else {
+      formData.append('company_id', selectedCompany);
     }
 
     try {
@@ -79,6 +99,7 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
   const handleClose = () => {
     setFile(null);
     setSelectedSegment(segmentId || '');
+    setSelectedCompany('');
     setUploadResult(null);
     onClose();
   };
@@ -134,6 +155,60 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
                         </option>
                       ))}
                     </select>
+                  </div>
+                )}
+
+                {uploadType === 'contact' && (
+                  <div className="space-y-4">
+                    {/* Segment dropdown */}
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                        Segment *
+                      </label>
+                      <select
+                        value={selectedSegment}
+                        onChange={(e) => { setSelectedSegment(e.target.value); setSelectedCompany(''); }}
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      >
+                        <option value="">Select a segment</option>
+                        {segmentsData?.items.map((segment) => (
+                          <option key={segment.id} value={segment.id}>
+                            {segment.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Company dropdown */}
+                    {selectedSegment && (
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                          Company *
+                        </label>
+                        <select
+                          value={selectedCompany}
+                          onChange={(e) => setSelectedCompany(e.target.value)}
+                          disabled={isLoadingCompanies}
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
+                        >
+                          <option value="">{isLoadingCompanies ? 'Loading companies...' : 'Select a company'}</option>
+                          {companiesData?.items.map((company) => (
+                            <option key={company.id} value={company.id}>
+                              {company.company_name}
+                            </option>
+                          ))}
+                        </select>
+                        {!isLoadingCompanies && companiesData && companiesData.items.length === 0 && (
+                          <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                            No companies found in this segment. Upload companies first.
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      All contacts in the CSV will be assigned to the selected company.
+                    </p>
                   </div>
                 )}
 
@@ -206,7 +281,12 @@ export function UploadModal({ isOpen, onClose, uploadType, segmentId }: UploadMo
                   </button>
                   <button
                     onClick={handleUpload}
-                    disabled={!file || isUploading || (uploadType === 'company' && !selectedSegment)}
+                    disabled={
+                      !file ||
+                      isUploading ||
+                      (uploadType === 'company' && !selectedSegment) ||
+                      (uploadType === 'contact' && (!selectedSegment || !selectedCompany))
+                    }
                     className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isUploading ? 'Uploading...' : 'Upload'}

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { Plus, Mail, Calendar, X } from 'lucide-react';
-import { useUsers, useUser, useCreateUser, useUpdateUser } from '../hooks/useUsers';
+import { useUsers, useUser, useCreateUser, useUpdateUser, useUpdateUserRoles, useDeactivateUser, useActivateUser } from '../hooks/useUsers';
 import {
   DataTable,
   FilterBar,
@@ -76,6 +76,9 @@ export default function UserManagement() {
 
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
+  const updateUserRoles = useUpdateUserRoles();
+  const deactivateUser = useDeactivateUser();
+  const activateUser = useActivateUser();
 
   const handleFilterChange = (key: string, value: string) => {
     if (key === 'role') {
@@ -120,13 +123,19 @@ export default function UserManagement() {
     const formData = new FormData(e.currentTarget);
     const roles = formData.getAll('roles') as string[];
 
+    // Update user fields (name, email)
     await updateUser.mutateAsync({
       id: selectedUserId,
       data: {
         name: formData.get('name') as string,
         email: formData.get('email') as string,
-        roles,
       },
+    });
+
+    // Update roles separately via dedicated endpoint
+    await updateUserRoles.mutateAsync({
+      id: selectedUserId,
+      roles,
     });
 
     setIsEditing(false);
@@ -135,12 +144,11 @@ export default function UserManagement() {
   const handleToggleStatus = async () => {
     if (!selectedUserId || !selectedUser) return;
 
-    await updateUser.mutateAsync({
-      id: selectedUserId,
-      data: {
-        status: selectedUser.status === 'active' ? 'deactivated' : 'active',
-      },
-    });
+    if (selectedUser.status === 'active') {
+      await deactivateUser.mutateAsync(selectedUserId);
+    } else {
+      await activateUser.mutateAsync(selectedUserId);
+    }
   };
 
   const columns: ColumnConfig<User>[] = [

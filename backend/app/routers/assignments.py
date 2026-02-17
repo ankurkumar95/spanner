@@ -23,12 +23,12 @@ router = APIRouter()
 async def create_assignment(
     data: AssignmentCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_roles("admin", "segment_owner"))
+    current_user: dict = Depends(require_roles("admin", "segment_owner", "approver"))
 ):
     """
     Create a new assignment.
 
-    Requires admin or segment_owner role.
+    Requires admin, segment_owner, or approver role.
     """
     try:
         assignment = await assignment_service.create_assignment(
@@ -50,12 +50,12 @@ async def create_assignment(
 async def create_bulk_assignments(
     data: AssignmentBulkCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_roles("admin", "segment_owner"))
+    current_user: dict = Depends(require_roles("admin", "segment_owner", "approver"))
 ):
     """
     Create multiple assignments at once.
 
-    Requires admin or segment_owner role.
+    Requires admin, segment_owner, or approver role.
     """
     try:
         assignments = await assignment_service.create_bulk_assignments(
@@ -77,12 +77,12 @@ async def create_bulk_assignments(
 async def delete_assignment(
     data: AssignmentDelete,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_roles("admin", "segment_owner"))
+    current_user: dict = Depends(require_roles("admin", "segment_owner", "approver"))
 ):
     """
     Delete an assignment.
 
-    Requires admin or segment_owner role.
+    Requires admin, segment_owner, or approver role.
     """
     deleted = await assignment_service.delete_assignment(
         db=db,

@@ -122,12 +122,12 @@ async def list_contacts(
 async def create_contact(
     contact_data: ContactCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_roles("researcher", "admin"))
+    current_user: dict = Depends(require_roles("researcher", "approver", "admin"))
 ):
     """
     Create a new contact.
 
-    Requires: researcher or admin role
+    Requires: researcher, approver, or admin role
 
     Auto-derives segment_id from the company's segment.
     """
@@ -270,11 +270,12 @@ async def assign_contact_to_sdr(
     contact_id: UUID,
     assignment: ContactAssignment,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(require_roles("approver", "admin"))
 ):
     """
     Assign a contact to an SDR (move from approved to assigned_to_sdr status).
 
+    Requires: approver or admin role
     Status pipeline: approved -> assigned_to_sdr
     """
     try:
@@ -309,11 +310,12 @@ async def assign_contact_to_sdr(
 async def bulk_assign_contacts(
     request: BulkAssignmentRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(require_roles("approver", "admin"))
 ):
     """
     Bulk assign multiple contacts to an SDR.
 
+    Requires: approver or admin role.
     All contacts must be in 'approved' status.
     """
     try:
@@ -352,11 +354,12 @@ async def bulk_assign_contacts(
 async def mark_meeting_scheduled(
     contact_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_active_user)
+    current_user: dict = Depends(require_roles("sdr", "approver", "admin"))
 ):
     """
     Mark a contact as having a meeting scheduled.
 
+    Requires: sdr, approver, or admin role
     Status pipeline: assigned_to_sdr -> meeting_scheduled
     """
     try:

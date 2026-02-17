@@ -1,0 +1,6 @@
+company_name,company_website,company_phone,company_description,company_linkedin_url,company_industry,company_sub_industry,street,city,state_province,country_region,zip_postal_code,founded_year,revenue_range,employee_size_range
+Acme Corp,https://acme.com,+1-555-100-1000,Enterprise SaaS platform for logistics,https://linkedin.com/company/acme,Technology,Enterprise Software,100 Market St,San Francisco,CA,United States,94105,2015,$10M-$50M,51-200
+GlobalTech Solutions,https://globaltech.io,+1-555-200-2000,AI-powered analytics platform,https://linkedin.com/company/globaltech,Technology,Artificial Intelligence,200 Innovation Blvd,Austin,TX,United States,73301,2018,$1M-$10M,11-50
+Meridian Healthcare,https://meridianhc.com,+1-555-300-3000,Digital health records management,,Healthcare,Health IT,500 Wellness Dr,Boston,MA,United States,02101,2010,$50M-$100M,201-500
+Summit Financial,https://summitfin.com,+1-555-400-4000,Fintech payment processing,https://linkedin.com/company/summitfin,Financial Services,Payments,300 Wall St,New York,NY,United States,10005,2012,$100M+,501-1000
+CloudNine Studios,https://cloudnine.dev,,Creative cloud collaboration tools,https://linkedin.com/company/cloudnine,Technology,Creative Tools,50 Design Ave,Seattle,WA,United States,98101,2020,$1M-$10M,11-50

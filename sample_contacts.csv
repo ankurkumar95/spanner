@@ -1,0 +1,7 @@
+company_name,first_name,last_name,email,mobile_phone,job_title,direct_phone_number,email_address_2,lead_source_global,management_level,street,city,state_province,country_region,zip_postal_code,primary_time_zone,contact_linkedin_url
+Acme Corp,Sarah,Chen,sarah.chen@acme.com,+1-555-101-0001,VP of Engineering,+1-555-101-0002,,LinkedIn,VP,100 Market St,San Francisco,CA,United States,94105,US/Pacific,https://linkedin.com/in/sarachen
+Acme Corp,James,Wilson,james.wilson@acme.com,+1-555-101-0003,CTO,,,Referral,C-Level,100 Market St,San Francisco,CA,United States,94105,US/Pacific,https://linkedin.com/in/jameswilson
+GlobalTech Solutions,Priya,Sharma,priya.sharma@globaltech.io,+1-555-201-0001,Head of Data Science,,priya.s@gmail.com,Conference,Director,200 Innovation Blvd,Austin,TX,United States,73301,US/Central,https://linkedin.com/in/priyasharma
+Meridian Healthcare,Robert,Kim,robert.kim@meridianhc.com,+1-555-301-0001,Chief Medical Officer,+1-555-301-0002,,Website,C-Level,500 Wellness Dr,Boston,MA,United States,02101,US/Eastern,
+Summit Financial,Elena,Rodriguez,elena.rodriguez@summitfin.com,,Director of Partnerships,+1-555-401-0001,,LinkedIn,Director,300 Wall St,New York,NY,United States,10005,US/Eastern,https://linkedin.com/in/elenarodriguez
+CloudNine Studios,Alex,Turner,alex.turner@cloudnine.dev,+1-555-501-0001,Founder & CEO,,,Outbound,C-Level,50 Design Ave,Seattle,WA,United States,98101,US/Pacific,https://linkedin.com/in/alexturner

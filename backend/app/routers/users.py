@@ -33,7 +33,7 @@ async def list_users(
     per_page: int = Query(20, ge=1, le=100, description="Items per page"),
     status_filter: str | None = Query(None, pattern="^(active|deactivated)$", description="Filter by user status"),
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(require_roles("admin", "segment_owner"))
+    current_user: dict = Depends(require_roles("admin", "segment_owner", "approver"))
 ):
     """
     List users with pagination and optional status filtering.

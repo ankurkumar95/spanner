@@ -338,6 +338,13 @@ async def process_contact_csv(
         'contact_linkedin_url', 'linkedin_summary', 'data_requester_details'
     }
 
+    # If company_id provided, look up its segment_id
+    if company_id and not segment_id:
+        company_obj = await db.execute(select(Company).where(Company.id == company_id))
+        company_row = company_obj.scalar_one_or_none()
+        if company_row:
+            segment_id = company_row.segment_id
+
     # Build company name lookup if segment_id provided
     company_lookup = {}
     if segment_id and not company_id:

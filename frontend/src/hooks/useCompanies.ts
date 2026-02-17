@@ -106,6 +106,28 @@ export function useUpdateCompany() {
   });
 }
 
+export function useMarkCompanyDuplicate() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, is_duplicate }: { id: string; is_duplicate: boolean }) => {
+      const response = await api.post<Company>(`/companies/${id}/duplicate`, null, {
+        params: { is_duplicate },
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['companies'] });
+      queryClient.invalidateQueries({ queryKey: ['company', data.id] });
+      toast.success(data.is_duplicate ? 'Marked as duplicate' : 'Unmarked as duplicate');
+    },
+    onError: (error: unknown) => {
+      const message = error instanceof Error ? error.message : 'Failed to update duplicate status';
+      toast.error(message);
+    },
+  });
+}
+
 export function useApproveCompany() {
   const queryClient = useQueryClient();
 
