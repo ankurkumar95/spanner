@@ -23,6 +23,7 @@ export interface Segment {
   id: string;
   name: string;
   description: string | null;
+  research_filter_requirements: string;
   status: 'active' | 'archived';
   created_by: string;
   created_by_name: string | null;
@@ -74,6 +75,8 @@ export interface Company {
   batch_id: string | null;
   created_by: string;
   created_by_name: string | null;
+  approved_by_name: string | null;
+  approved_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -99,6 +102,8 @@ export interface Contact {
   is_duplicate: boolean;
   created_by: string;
   created_by_name: string | null;
+  approved_by_name: string | null;
+  approved_at: string | null;
   created_at: string;
   updated_at: string;
 }

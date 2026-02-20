@@ -59,6 +59,7 @@ class SegmentBase(BaseModel):
 
     name: str = Field(min_length=1, max_length=255)
     description: str | None = Field(None, max_length=5000)
+    research_filter_requirements: str = Field(min_length=1, max_length=10000)
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -75,6 +76,7 @@ class SegmentUpdate(BaseModel):
 
     name: str | None = Field(None, min_length=1, max_length=255)
     description: str | None = Field(None, max_length=5000)
+    research_filter_requirements: str | None = Field(None, min_length=1, max_length=10000)
     status: SegmentStatusEnum | None = None
     offering_ids: list[UUID] | None = Field(None, description="List of offering IDs to associate (replaces existing)")
 
@@ -95,6 +97,7 @@ class SegmentResponse(SegmentBrief):
     """Full segment response schema."""
 
     description: str | None
+    research_filter_requirements: str = ""
     created_by: UUID
     created_by_name: str | None = None
     created_at: datetime

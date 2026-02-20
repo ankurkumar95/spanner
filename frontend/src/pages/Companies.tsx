@@ -25,6 +25,11 @@ export default function Companies() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [formStreet, setFormStreet] = useState('');
+  const [formCity, setFormCity] = useState('');
+  const [formState, setFormState] = useState('');
+  const [formCountry, setFormCountry] = useState('');
+  const [formZip, setFormZip] = useState('');
 
   const limit = 20;
   const createCompany = useCreateCompany();
@@ -92,8 +97,18 @@ export default function Companies() {
         employee_size_range: employee_size_range || undefined,
         revenue_range: revenue_range || undefined,
         founded_year: founded_year_str ? parseInt(founded_year_str, 10) : undefined,
+        street: formStreet || undefined,
+        city: formCity || undefined,
+        state_province: formState || undefined,
+        country_region: formCountry || undefined,
+        zip_postal_code: formZip || undefined,
       });
       setIsCreateModalOpen(false);
+      setFormStreet('');
+      setFormCity('');
+      setFormState('');
+      setFormCountry('');
+      setFormZip('');
       e.currentTarget.reset();
     } catch (error) {
       // Error is handled by the mutation's onError
@@ -778,7 +793,14 @@ export default function Companies() {
                       <div className="mt-3 h-1 w-16 bg-primary-600 rounded-full" />
                     </div>
                     <button
-                      onClick={() => setIsCreateModalOpen(false)}
+                      onClick={() => {
+                        setIsCreateModalOpen(false);
+                        setFormStreet('');
+                        setFormCity('');
+                        setFormState('');
+                        setFormCountry('');
+                        setFormZip('');
+                      }}
                       className="text-slate-400 hover:text-slate-500 dark:text-slate-500 dark:hover:text-slate-400 transition-colors"
                     >
                       <X className="h-5 w-5" />
@@ -1043,12 +1065,119 @@ export default function Companies() {
 
                   </div>
 
+                  {/* Section 3: Location */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                        Location
+                      </h3>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Physical address of the company.
+                    </p>
+
+                    <div>
+                      <label
+                        htmlFor="create_street"
+                        className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                      >
+                        Street Address
+                      </label>
+                      <input
+                        type="text"
+                        id="create_street"
+                        value={formStreet}
+                        onChange={(e) => setFormStreet(e.target.value)}
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="e.g. 123 Main St"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="create_city"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          City
+                        </label>
+                        <input
+                          type="text"
+                          id="create_city"
+                          value={formCity}
+                          onChange={(e) => setFormCity(e.target.value)}
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="e.g. San Francisco"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="create_state"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          State/Province
+                        </label>
+                        <input
+                          type="text"
+                          id="create_state"
+                          value={formState}
+                          onChange={(e) => setFormState(e.target.value)}
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="e.g. CA"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="create_country"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          Country/Region
+                        </label>
+                        <input
+                          type="text"
+                          id="create_country"
+                          value={formCountry}
+                          onChange={(e) => setFormCountry(e.target.value)}
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="e.g. United States"
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="create_zip"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          Zip/Postal Code
+                        </label>
+                        <input
+                          type="text"
+                          id="create_zip"
+                          value={formZip}
+                          onChange={(e) => setFormZip(e.target.value)}
+                          className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                          placeholder="e.g. 94105"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Footer */}
                   <div className="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
                     <div className="flex justify-end gap-3">
                       <button
                         type="button"
-                        onClick={() => setIsCreateModalOpen(false)}
+                        onClick={() => {
+                          setIsCreateModalOpen(false);
+                          setFormStreet('');
+                          setFormCity('');
+                          setFormState('');
+                          setFormCountry('');
+                          setFormZip('');
+                        }}
                         className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors"
                       >
                         Cancel

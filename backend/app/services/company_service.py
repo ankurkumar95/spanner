@@ -1,4 +1,5 @@
 """Company service layer for business logic."""
+from datetime import datetime, timezone
 from uuid import UUID
 
 from sqlalchemy import func, select
@@ -71,7 +72,7 @@ async def get_company(
     query = (
         select(Company)
         .where(Company.id == company_id)
-        .options(selectinload(Company.segment), selectinload(Company.created_by_user))
+        .options(selectinload(Company.segment), selectinload(Company.created_by_user), selectinload(Company.approved_by_user))
     )
 
     result = await db.execute(query)
@@ -102,7 +103,7 @@ async def list_companies(
     Returns:
         List of company instances
     """
-    query = select(Company).options(selectinload(Company.segment), selectinload(Company.created_by_user))
+    query = select(Company).options(selectinload(Company.segment), selectinload(Company.created_by_user), selectinload(Company.approved_by_user))
 
     # Apply filters
     if segment_id is not None:
@@ -214,7 +215,8 @@ async def update_company(
 async def approve_company(
     db: AsyncSession,
     company_id: UUID,
-    approval: CompanyApproval
+    approval: CompanyApproval,
+    approved_by: UUID | None = None
 ) -> Company:
     """
     Approve or reject a company.
@@ -245,9 +247,12 @@ async def approve_company(
     # Update status and rejection reason
     company.status = approval.status
     company.rejection_reason = approval.rejection_reason
+    if approved_by:
+        company.approved_by = approved_by
+        company.approved_at = datetime.now(timezone.utc)
 
     await db.flush()
-    await db.refresh(company, ["segment", "created_by_user"])
+    await db.refresh(company, ["segment", "created_by_user", "approved_by_user"])
 
     return company
 
@@ -271,7 +276,7 @@ async def get_pending_companies(
     query = (
         select(Company)
         .where(Company.status == CompanyStatusEnum.PENDING)
-        .options(selectinload(Company.segment), selectinload(Company.created_by_user))
+        .options(selectinload(Company.segment), selectinload(Company.created_by_user), selectinload(Company.approved_by_user))
         .order_by(Company.created_at.asc())
         .offset(skip)
         .limit(limit)

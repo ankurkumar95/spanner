@@ -145,6 +145,8 @@ async def get_company(
         "batch_id": company.batch_id,
         "created_by": company.created_by,
         "created_by_name": company.created_by_name,
+        "approved_by_name": company.approved_by_name,
+        "approved_at": company.approved_at,
         "created_at": company.created_at,
         "updated_at": company.updated_at,
         "contact_count": contact_count
@@ -206,10 +208,12 @@ async def approve_company(
     Rejection requires a rejection_reason.
     """
     try:
+        user_id = UUID(current_user["id"])
         company = await company_service.approve_company(
             db=db,
             company_id=company_id,
-            approval=approval
+            approval=approval,
+            approved_by=user_id
         )
         return company
 

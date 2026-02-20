@@ -1,9 +1,11 @@
 """Contact model."""
 import enum
 import uuid
+from datetime import datetime
 
 from sqlalchemy import (
     Boolean,
+    DateTime,
     Enum as SAEnum,
     ForeignKey,
     Text,
@@ -100,6 +102,14 @@ class Contact(BaseModel):
         nullable=False,
         index=True
     )
+    approved_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    approved_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # Relationships
     company: Mapped["Company"] = relationship("Company", back_populates="contacts")
@@ -108,6 +118,10 @@ class Contact(BaseModel):
         "User",
         back_populates="created_contacts",
         foreign_keys=[created_by]
+    )
+    approved_by_user: Mapped["User | None"] = relationship(
+        "User",
+        foreign_keys=[approved_by]
     )
     assigned_sdr: Mapped["User | None"] = relationship(
         "User",
@@ -128,6 +142,13 @@ class Contact(BaseModel):
         """Return the name of the user who created this contact."""
         if self.created_by_user:
             return self.created_by_user.name
+        return None
+
+    @property
+    def approved_by_name(self) -> str | None:
+        """Return the name of the user who approved this contact."""
+        if self.approved_by_user:
+            return self.approved_by_user.name
         return None
 
     def __repr__(self) -> str:

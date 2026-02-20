@@ -239,7 +239,8 @@ async def approve_contact(
     Status pipeline: uploaded -> approved
     """
     try:
-        contact = await contact_service.approve_contact(db, contact_id, approval)
+        user_id = UUID(current_user["id"])
+        contact = await contact_service.approve_contact(db, contact_id, approval, approved_by=user_id)
 
         logger.info(
             f"Contact approved: {contact.email} (ID: {contact_id}) by {current_user['email']}"

@@ -348,6 +348,24 @@ export default function Approvals() {
                     </label>
                     <StatusBadge status={selectedCompany.status} />
                   </div>
+                  {selectedCompany.approved_by_name && (
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
+                        Approved By
+                      </label>
+                      <p className="text-sm text-slate-900 dark:text-white">{selectedCompany.approved_by_name}</p>
+                    </div>
+                  )}
+                  {selectedCompany.approved_at && (
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
+                        Approved At
+                      </label>
+                      <p className="text-sm text-slate-900 dark:text-white">
+                        {format(new Date(selectedCompany.approved_at), 'MMM d, yyyy h:mm a')}
+                      </p>
+                    </div>
+                  )}
                   {selectedCompany.is_duplicate && (
                     <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
                       <p className="text-xs font-medium text-amber-800 dark:text-amber-400">
@@ -371,6 +389,22 @@ export default function Approvals() {
                         className="text-primary-600 hover:text-primary-700 inline-flex items-center gap-1"
                       >
                         <span className="truncate max-w-[200px]">{selectedCompany.company_website}</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ) : (
+                      <span className="text-slate-400 dark:text-slate-500">—</span>
+                    )}
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">LinkedIn URL</span>
+                    {selectedCompany.company_linkedin_url ? (
+                      <a
+                        href={selectedCompany.company_linkedin_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary-600 hover:text-primary-700 inline-flex items-center gap-1"
+                      >
+                        <span className="truncate max-w-[200px]">{selectedCompany.company_linkedin_url}</span>
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     ) : (

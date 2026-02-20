@@ -6,6 +6,7 @@ status pipeline (uploaded -> approved -> assigned_to_sdr -> meeting_scheduled),
 SDR assignment, and duplicate flagging.
 """
 
+from datetime import datetime, timezone
 from uuid import UUID
 
 from sqlalchemy import select, func, or_
@@ -92,7 +93,7 @@ async def get_contact(db: AsyncSession, contact_id: UUID) -> Contact | None:
     """
     result = await db.execute(
         select(Contact)
-        .options(selectinload(Contact.company), selectinload(Contact.segment), selectinload(Contact.created_by_user))
+        .options(selectinload(Contact.company), selectinload(Contact.segment), selectinload(Contact.created_by_user), selectinload(Contact.approved_by_user))
         .where(Contact.id == contact_id)
     )
     return result.scalar_one_or_none()
@@ -129,7 +130,8 @@ async def list_contacts(
     query = select(Contact).options(
         selectinload(Contact.company),
         selectinload(Contact.segment),
-        selectinload(Contact.created_by_user)
+        selectinload(Contact.created_by_user),
+        selectinload(Contact.approved_by_user)
     )
 
     # Apply filters
@@ -271,7 +273,8 @@ async def update_contact(
 async def approve_contact(
     db: AsyncSession,
     contact_id: UUID,
-    approval: ContactApproval
+    approval: ContactApproval,
+    approved_by: UUID | None = None
 ) -> Contact:
     """
     Approve contact (set status to approved).
@@ -304,9 +307,12 @@ async def approve_contact(
         )
 
     contact.status = ContactStatusEnum.APPROVED
+    if approved_by:
+        contact.approved_by = approved_by
+        contact.approved_at = datetime.now(timezone.utc)
 
     await db.flush()
-    await db.refresh(contact, ["company", "segment", "created_by_user"])
+    await db.refresh(contact, ["company", "segment", "created_by_user", "approved_by_user"])
 
     return contact
 

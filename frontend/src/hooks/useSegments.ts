@@ -16,12 +16,14 @@ interface SegmentsParams {
 interface CreateSegmentData {
   name: string;
   description?: string;
+  research_filter_requirements: string;
   offering_ids?: string[];
 }
 
 interface UpdateSegmentData {
   name?: string;
   description?: string;
+  research_filter_requirements?: string;
   offering_ids?: string[];
 }
 

@@ -38,6 +38,7 @@ async def create_segment(
     segment = Segment(
         name=data.name,
         description=data.description,
+        research_filter_requirements=data.research_filter_requirements,
         status=data.status,
         created_by=created_by
     )

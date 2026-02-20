@@ -1,9 +1,11 @@
 """Company model."""
 import enum
 import uuid
+from datetime import datetime
 
 from sqlalchemy import (
     Boolean,
+    DateTime,
     Enum as SAEnum,
     ForeignKey,
     Integer,
@@ -83,6 +85,14 @@ class Company(BaseModel):
         nullable=False,
         index=True
     )
+    approved_by: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    approved_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # Relationships
     segment: Mapped["Segment"] = relationship("Segment", back_populates="companies")
@@ -90,6 +100,10 @@ class Company(BaseModel):
         "User",
         back_populates="created_companies",
         foreign_keys=[created_by]
+    )
+    approved_by_user: Mapped["User | None"] = relationship(
+        "User",
+        foreign_keys=[approved_by]
     )
     contacts: Mapped[list["Contact"]] = relationship(
         "Contact",
@@ -111,6 +125,13 @@ class Company(BaseModel):
         """Return the name of the user who created this company."""
         if self.created_by_user:
             return self.created_by_user.name
+        return None
+
+    @property
+    def approved_by_name(self) -> str | None:
+        """Return the name of the user who approved this company."""
+        if self.approved_by_user:
+            return self.approved_by_user.name
         return None
 
     def __repr__(self) -> str:

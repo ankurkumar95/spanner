@@ -105,6 +105,8 @@ class ContactResponse(ContactBase):
     batch_id: UUID | None
     created_by: UUID
     created_by_name: str | None = None
+    approved_by_name: str | None = None
+    approved_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
 

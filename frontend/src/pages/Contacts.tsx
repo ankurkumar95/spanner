@@ -27,6 +27,7 @@ export default function Contacts() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [saveAndAddAnother, setSaveAndAddAnother] = useState(false);
+  const [formMobilePhone, setFormMobilePhone] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedSdrId, setSelectedSdrId] = useState('');
@@ -101,17 +102,20 @@ export default function Contacts() {
         email,
         company_id,
         job_title: job_title || undefined,
+        mobile_phone: formMobilePhone || undefined,
         contact_linkedin_url: linkedin_profile ? `https://linkedin.com/in/${linkedin_profile}` : undefined,
       });
 
       if (saveAndAddAnother) {
         // Reset form but keep modal open
         e.currentTarget.reset();
+        setFormMobilePhone('');
         setSaveAndAddAnother(false);
       } else {
         // Close modal and reset form
         setIsCreateModalOpen(false);
         e.currentTarget.reset();
+        setFormMobilePhone('');
       }
     } catch (error) {
       // Error is handled by the mutation's onError
@@ -810,6 +814,30 @@ export default function Contacts() {
                             required
                             className="w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                             placeholder="jane.doe@example.com"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Mobile Number */}
+                      <div>
+                        <label
+                          htmlFor="mobile_phone"
+                          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+                        >
+                          Mobile Number
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Phone className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                          </div>
+                          <input
+                            type="tel"
+                            id="mobile_phone"
+                            name="mobile_phone"
+                            value={formMobilePhone}
+                            onChange={(e) => setFormMobilePhone(e.target.value)}
+                            className="w-full pl-10 pr-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            placeholder="Enter mobile number"
                           />
                         </div>
                       </div>

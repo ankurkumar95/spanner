@@ -31,6 +31,7 @@ export default function Segments() {
   // Create form state
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
+  const [formResearchFilterRequirements, setFormResearchFilterRequirements] = useState('');
   const [formIsActive, setFormIsActive] = useState(true);
   const [selectedOfferings, setSelectedOfferings] = useState<SelectedOffering[]>([]);
   const [offeringSearch, setOfferingSearch] = useState('');
@@ -110,6 +111,7 @@ export default function Segments() {
   const resetCreateForm = () => {
     setFormName('');
     setFormDescription('');
+    setFormResearchFilterRequirements('');
     setFormIsActive(true);
     setSelectedOfferings([]);
     setOfferingSearch('');
@@ -145,6 +147,7 @@ export default function Segments() {
       await createSegment.mutateAsync({
         name: formName,
         description: formDescription || undefined,
+        research_filter_requirements: formResearchFilterRequirements,
         offering_ids: selectedOfferings.map((o) => o.id),
       });
       handleCloseCreateModal();
@@ -328,6 +331,16 @@ export default function Segments() {
                           {selectedSegment.description || 'No description provided'}
                         </p>
                       </div>
+                      {selectedSegment.research_filter_requirements && (
+                        <div>
+                          <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
+                            Research Filter Requirements
+                          </label>
+                          <p className="text-sm text-slate-900 dark:text-white whitespace-pre-wrap">
+                            {selectedSegment.research_filter_requirements}
+                          </p>
+                        </div>
+                      )}
                       <div>
                         <label className="block text-xs font-medium text-slate-400 dark:text-slate-500 mb-1">
                           Status
@@ -601,6 +614,25 @@ export default function Segments() {
                       <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
                         Internal notes to help your team understand this segment's purpose.
                       </p>
+                    </div>
+
+                    {/* Research Filter Requirements */}
+                    <div>
+                      <label
+                        htmlFor="segment-research-filter-requirements"
+                        className="block text-sm font-medium text-slate-900 dark:text-white mb-1.5"
+                      >
+                        Research Filter Requirements <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        id="segment-research-filter-requirements"
+                        rows={4}
+                        required
+                        value={formResearchFilterRequirements}
+                        onChange={(e) => setFormResearchFilterRequirements(e.target.value)}
+                        placeholder="Specify the research filter criteria for this segment..."
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm resize-none"
+                      />
                     </div>
                   </div>
 

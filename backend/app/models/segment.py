@@ -37,6 +37,9 @@ class Segment(Base, UUIDPKMixin, TimestampMixin):
 
     name: Mapped[str] = mapped_column(Text, unique=True, nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    research_filter_requirements: Mapped[str] = mapped_column(
+        Text, nullable=False, server_default=""
+    )
     status: Mapped[SegmentStatusEnum] = mapped_column(
         SAEnum(SegmentStatusEnum, name="segment_status", create_type=False, values_callable=lambda x: [e.value for e in x]),
         nullable=False,
