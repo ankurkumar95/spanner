@@ -247,7 +247,7 @@ async def approve_company(
     # Update status and rejection reason
     company.status = approval.status
     company.rejection_reason = approval.rejection_reason
-    if approved_by:
+    if approved_by and approval.status == CompanyStatusEnum.APPROVED:
         company.approved_by = approved_by
         company.approved_at = datetime.now(timezone.utc)
 
