@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { CheckCircle, XCircle, ExternalLink, MapPin, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, AlertTriangle } from 'lucide-react';
 import { useCompanies, useCompany, useApproveCompany, useRejectCompany } from '../hooks/useCompanies';
 import { useContacts, useContact, useApproveContact } from '../hooks/useContacts';
+import { useSegments } from '../hooks/useSegments';
 import {
   DataTable,
   FilterBar,
@@ -46,6 +47,17 @@ export default function Approvals() {
 
   const { data: selectedContact, isLoading: isLoadingContact } = useContact(
     activeTab === 'contacts' && selectedId ? selectedId : ''
+  );
+
+  // Lookup data for table columns
+  const { data: segmentsData } = useSegments({ limit: 100 });
+  const { data: allCompaniesData } = useCompanies({ limit: 100 });
+
+  const segmentNameMap = new Map(
+    segmentsData?.items.map((s) => [s.id, s.name]) || []
+  );
+  const companyNameMap = new Map(
+    allCompaniesData?.items.map((c) => [c.id, c.company_name]) || []
   );
 
   // Fetch parent company for selected contact to check approval status
@@ -103,6 +115,16 @@ export default function Approvals() {
       ),
     },
     {
+      key: 'segment_id',
+      header: 'Segment',
+      width: '20%',
+      render: (item) => (
+        <div className="text-slate-600 dark:text-slate-400 truncate max-w-[150px]">
+          {segmentNameMap.get(item.segment_id) || '—'}
+        </div>
+      ),
+    },
+    {
       key: 'company_industry',
       header: 'Industry',
       width: '20%',
@@ -131,28 +153,6 @@ export default function Approvals() {
         ),
     },
     {
-      key: 'city',
-      header: 'Location',
-      width: '20%',
-      render: (item) => {
-        const location = [item.city, item.state_province, item.country_region]
-          .filter(Boolean)
-          .join(', ');
-        return (
-          <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
-            {location ? (
-              <>
-                <MapPin className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
-                <span className="truncate max-w-[120px]">{location}</span>
-              </>
-            ) : (
-              '—'
-            )}
-          </div>
-        );
-      },
-    },
-    {
       key: 'created_at',
       header: 'Uploaded',
       width: '15%',
@@ -170,7 +170,7 @@ export default function Approvals() {
       header: 'Name',
       width: '20%',
       render: (item) => (
-        <div className="font-medium text-slate-900">
+        <div className="font-medium text-slate-900 dark:text-white">
           {item.first_name} {item.last_name}
         </div>
       ),
@@ -178,9 +178,19 @@ export default function Approvals() {
     {
       key: 'email',
       header: 'Email',
-      width: '25%',
+      width: '20%',
       render: (item) => (
-        <div className="text-slate-600">{item.email}</div>
+        <div className="text-slate-600 dark:text-slate-400 truncate">{item.email}</div>
+      ),
+    },
+    {
+      key: 'company_id',
+      header: 'Company',
+      width: '20%',
+      render: (item) => (
+        <div className="text-slate-600 dark:text-slate-400 truncate max-w-[150px]">
+          {companyNameMap.get(item.company_id) || '—'}
+        </div>
       ),
     },
     {
@@ -188,15 +198,7 @@ export default function Approvals() {
       header: 'Job Title',
       width: '20%',
       render: (item) => (
-        <div className="text-slate-600">{item.job_title || '—'}</div>
-      ),
-    },
-    {
-      key: 'mobile_phone',
-      header: 'Phone',
-      width: '15%',
-      render: (item) => (
-        <div className="text-slate-600">{item.mobile_phone || '—'}</div>
+        <div className="text-slate-600 dark:text-slate-400">{item.job_title || '—'}</div>
       ),
     },
     {

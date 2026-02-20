@@ -494,6 +494,20 @@ export default function Contacts() {
                       <span className="text-slate-600 dark:text-slate-400">Created By</span>
                       <span className="text-slate-900 dark:text-white font-medium">{selectedContact.created_by_name || selectedContact.created_by}</span>
                     </div>
+                    {selectedContact.approved_by_name && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-400">Approved By</span>
+                        <span className="text-slate-900 dark:text-white font-medium">{selectedContact.approved_by_name}</span>
+                      </div>
+                    )}
+                    {selectedContact.approved_at && (
+                      <div className="flex justify-between">
+                        <span className="text-slate-600 dark:text-slate-400">Approved At</span>
+                        <span className="text-slate-900 dark:text-white font-medium">
+                          {format(new Date(selectedContact.approved_at), 'MMM d, yyyy h:mm a')}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
